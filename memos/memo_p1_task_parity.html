@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results Memo — Project 1: Task-Level Cost Parity and AI Usage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ea;--paper-deep:#efe9db;--ink:#1d1a16;--ink-soft:#4d463c;
+--rule:#c9bfae;--oxblood:#7e2a23;--prussian:#1f3a5f;--gold:#9a7b2d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Source Serif 4",serif;font-size:16.5px;line-height:1.65}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+.crumb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+letter-spacing:.12em;text-transform:uppercase}
+.crumb a{color:var(--prussian);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;
+line-height:1.25;margin:18px 0 6px}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;
+margin:34px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:17.5px;
+margin:26px 0 8px}
+p,li{color:var(--ink-soft)}
+strong{color:var(--ink)}
+a{color:var(--prussian)}
+em{color:var(--ink-soft)}
+hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:13px;
+background:var(--paper-deep);padding:1px 5px;border-radius:2px}
+pre{background:var(--paper-deep);border-left:3px solid var(--gold);
+padding:12px 16px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:18px 0;font-size:14.5px;width:100%}
+th,td{border:1px solid var(--rule);padding:7px 11px;text-align:left;
+vertical-align:top}
+th{background:var(--paper-deep);font-family:"IBM Plex Mono",monospace;
+font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+blockquote{border-left:3px solid var(--rule);margin:16px 0;
+padding:2px 18px;color:var(--ink-soft)}
+.foot{margin-top:56px;border-top:1px solid var(--rule);padding-top:14px;
+font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="crumb"><a href="../index.html">&larr; Will AI show up in the productivity statistics?</a> &nbsp;·&nbsp; Memo · Task-Level Cost Parity (W6)</div>
+<h1>Results Memo — Project 1: Task-Level Cost Parity and AI Usage</h1>
+<p><em>2026-06-10. Workstream W6 (cross-section + AEI-vintage panel). Code: <code>notebooks/20_task_parity.py</code>,
+<code>notebooks/22_task_parity_panel.py</code>, <code>src/task_parity.py</code>. Outputs: <code>notebooks/output/task_parity/</code>.
+Pre-registered specs: PAPER_NOTES.md §6 (locked 2026-06-10 before estimation).</em></p>
+<h2>Question</h2>
+<p>Does the human-vs-AI cost-parity gap predict task-level AI usage intensity — the cost-barrier →
+diffusion-speed law (elasticity ≈ −1 across 30 technologies, 1605–1983) rebuilt at the task level
+with measured inputs?</p>
+<h2>Data</h2>
+<ul>
+<li><strong>Usage and time measures:</strong> Anthropic Economic Index, O*NET task facets. Cross-section: Nov 2025
+  week (3,170 tasks; usage shares, <code>human_only_time</code> [hours], <code>human_with_ai_time</code> [minutes],
+  task success). Units verified against the published "AI reduces task time by 80% on average."</li>
+<li><strong>Task → occupation:</strong> O*NET Task Statements (86.3% exact-text merge; 535 unmatched tasks reported),
+  importance from Task Ratings.</li>
+<li><strong>Wages/employment:</strong> OES 2019 vintage (in-repo; BLS blocks scripted current downloads — relative
+  occupation wages are highly persistent; swap queued).</li>
+<li><strong>Panel:</strong> five public AEI vintages — Dec'24/Jan'25 (v1), Feb/Mar'25 (v2), Aug'25, Nov'25, Feb'26 —
+  harmonized at the normalized task-text layer. Balanced panel: 1,869 tasks × 5 vintages.</li>
+</ul>
+<p>Estimation sample (cross-section): 2,707 task-occupation rows, 2,063 tasks, 457 occupations.
+Median human/AI cost-parity ratio ≈ <strong>636x</strong> (p10 232x, p90 1,439x). Median measured time savings
+<strong>91%</strong>.</p>
+<h2>Results</h2>
+<h3>Cross-section (within-occupation, SEs clustered by occupation)</h3>
+<table>
+<thead>
+<tr>
+<th>Spec</th>
+<th>β (log parity gap)</th>
+<th>95% CI</th>
+<th>n</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No controls</td>
+<td><strong>+0.216</strong></td>
+<td>[+0.093, +0.338]</td>
+<td>2,615</td>
+</tr>
+<tr>
+<td><strong>Primary: + task-success control</strong></td>
+<td><strong>−0.030</strong></td>
+<td>[−0.164, +0.103]</td>
+<td>2,215</td>
+</tr>
+<tr>
+<td>Diagnostic: unnormalized usage</td>
+<td>+0.187</td>
+<td>[+0.064, +0.310]</td>
+<td>2,615</td>
+</tr>
+</tbody>
+</table>
+<p>The raw gradient has the predicted sign; the capability control absorbs it entirely. Cost advantage
+and capability are collinear across tasks — the cross-section cannot separate them.</p>
+<p>Coarse placebo: the wage gradient of AI activity is ~6x steeper now (AEI usage elasticity 1.49) than
+the pre-2022 exposure-score gradient (0.24). (The intended yearly placebo failed: <code>pct_ai</code> in the
+2011–2019 panel is a static exposure score, not a yearly series.)</p>
+<h3>Panel (first differences, vintage effects, task-clustered)</h3>
+<p>Identification: tasks assigned time-invariant price tiers (terciles of task size); commodity-tier
+prices collapsed <strong>$1.25 → $0.10/1M tokens (−92%)</strong> across the window while frontier stayed flat at
+$15. In first differences, time-invariant task capability drops out.</p>
+<p><strong>FD price elasticity of usage: −0.009 (se 0.010), 95% CI [−0.030, +0.012]; cluster p = 0.39;
+tier-permutation p = 0.43.</strong> Leave-one-vintage-out: −0.007 to −0.038 (the larger values when dropping
+early vintages, where a pricing-table composition artifact lives — see Threats).</p>
+<h2>Interpretation — the thesis this supports</h2>
+<p>Putting the two legs together with W5 (AI's input-cost barrier = 0.022, below the entire historical
+support; only the bits-distribution floor remains):</p>
+<blockquote>
+<p><strong>At parity gaps of ~600x, cost has ceased to bind. Task-level AI usage composition is
+capability-constrained, not price-constrained.</strong> The historical cost-barrier law (−1 elasticity)
+was estimated on technologies near their cost margins at launch; AI is the first technology in the
+sample's range to launch <em>past</em> its cost margin, and the law's task-level analogue correctly goes
+quiet there.</p>
+</blockquote>
+<p>This reframes the JMP from "the cost-barrier law at the task level" to <strong>"the cost-barrier law, and
+where it stops applying"</strong> — with the cross-section, the panel, and the W5 barrier accounting as the
+three mutually consistent pieces of evidence.</p>
+<h2>Threats and limitations (all logged)</h2>
+<ol>
+<li><strong>Selection into Claude usage</strong> — usage measures Claude-user task composition, not economy-wide
+   adoption. Occupation FE + footprint normalization mitigate within the data; Census BTOS provides
+   the firm-margin external anchor.</li>
+<li><strong>Tier price paths are built from a sparse 15-row pricing table</strong> — the mid tier shows a
+   composition artifact (representative model switches between v1 and v2). Fix queued: per-model
+   price histories (Artificial Analysis; AEI 1P API model mix).</li>
+<li><strong>Tier-correlated capability drift</strong> (frontier models improving faster on long tasks) survives
+   first-differencing; Δtask-success controls possible only on the v3-vintage subset.</li>
+<li>Single-week vintages; AEI time facets are model-estimated; OES 2019 wages; taxonomy drift handled
+   at the task-text layer (match rates reported per vintage pair).</li>
+</ol>
+<h2>Next steps</h2>
+<ol>
+<li>Per-model price histories → rebuilt task-level cost paths (kills the composition artifact).</li>
+<li>Event-study around specific dated price cuts rather than vintage-to-vintage differences.</li>
+<li>Swap May-2024+ OES wages when fetchable; pool second snapshot weeks when published.</li>
+<li>BTOS industry-level external validation of the capability-constrained interpretation.</li>
+</ol>
+<div class="foot">Part of a research program on GPT transitions and productivity ·
+every specification locked before estimation · code repository private — available on request</div>
+</div>
+</body>
+</html>

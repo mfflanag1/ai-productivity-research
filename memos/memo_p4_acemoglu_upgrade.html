@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results Memo — Project 4: The Acemoglu Upgrade (Measured Bottom-Up AI TFP Potential)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ea;--paper-deep:#efe9db;--ink:#1d1a16;--ink-soft:#4d463c;
+--rule:#c9bfae;--oxblood:#7e2a23;--prussian:#1f3a5f;--gold:#9a7b2d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Source Serif 4",serif;font-size:16.5px;line-height:1.65}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+.crumb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+letter-spacing:.12em;text-transform:uppercase}
+.crumb a{color:var(--prussian);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;
+line-height:1.25;margin:18px 0 6px}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;
+margin:34px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:17.5px;
+margin:26px 0 8px}
+p,li{color:var(--ink-soft)}
+strong{color:var(--ink)}
+a{color:var(--prussian)}
+em{color:var(--ink-soft)}
+hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:13px;
+background:var(--paper-deep);padding:1px 5px;border-radius:2px}
+pre{background:var(--paper-deep);border-left:3px solid var(--gold);
+padding:12px 16px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:18px 0;font-size:14.5px;width:100%}
+th,td{border:1px solid var(--rule);padding:7px 11px;text-align:left;
+vertical-align:top}
+th{background:var(--paper-deep);font-family:"IBM Plex Mono",monospace;
+font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+blockquote{border-left:3px solid var(--rule);margin:16px 0;
+padding:2px 18px;color:var(--ink-soft)}
+.foot{margin-top:56px;border-top:1px solid var(--rule);padding-top:14px;
+font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="crumb"><a href="../index.html">&larr; Will AI show up in the productivity statistics?</a> &nbsp;·&nbsp; Memo · The Acemoglu Upgrade (W7)</div>
+<h1>Results Memo — Project 4: The Acemoglu Upgrade (Measured Bottom-Up AI TFP Potential)</h1>
+<p><em>2026-06-10. Workstream W7. Code: <code>notebooks/21_acemoglu_upgrade.py</code> (consumes the W6 dataset).
+Outputs: <code>notebooks/output/acemoglu_upgrade/</code>. Pre-registered spec: PAPER_NOTES.md §7
+(locked 2026-06-10).</em></p>
+<h2>Question</h2>
+<p>Acemoglu (2024, "The Simple Macroeconomics of AI") computed AI's ten-year TFP potential (~0.66%)
+from two imputed inputs: Eloundou-style <em>exposure</em> shares (~20% of tasks) × one lab study's time
+savings (27%). The Anthropic Economic Index now measures both. What does the same calculation give
+with measured inputs?</p>
+<h2>Inputs, measured vs imputed</h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Acemoglu (imputed)</th>
+<th>This memo (measured)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task time savings</td>
+<td>27% (one lab study)</td>
+<td><strong>90% mean / 91% median</strong> per instance (AEI <code>human_only_time</code> vs <code>human_with_ai_time</code>, 2,707 task-occupation rows)</td>
+</tr>
+<tr>
+<td>Eligible task coverage</td>
+<td>~20% of tasks (exposure scores)</td>
+<td><strong>74.1% of the 2019 wage bill</strong> (AEI-observed tasks × O*NET importance × OES wage bills; unmerged tasks count as ZERO savings — conservative)</td>
+</tr>
+<tr>
+<td>Usage incidence</td>
+<td>adoption path assumption</td>
+<td>BTOS firm adoption 20.6% × 45% worker adoption = <strong>9.3% anchor</strong> (both in-repo, cited)</td>
+</tr>
+</tbody>
+</table>
+<h2>Results</h2>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CEILING TFP</strong> (all eligible task work AI-assisted)</td>
+<td><strong>39.4%</strong></td>
+</tr>
+<tr>
+<td><strong>REALIZED-now TFP</strong> (current incidence anchor)</td>
+<td><strong>3.6%</strong></td>
+</tr>
+<tr>
+<td>Acemoglu (2024), ten-year</td>
+<td>0.66%</td>
+</tr>
+</tbody>
+</table>
+<p>Break-size mapping (links to W1/W4): spread over a 10-year diffusion, the ceiling implies
++3.9%/yr on the TFP increment — <strong>~49x the electrification-era regime shift</strong>, beyond any historical
+transition; the realized-now number implies +0.36%/yr — ~5x the electrification shift, i.e.,
+electrification-class if sustained.</p>
+<h2>The finding is the bracket, not either endpoint</h2>
+<p>The ceiling's absurd size is itself the key diagnostic: <strong>per-instance measured savings (90%, on
+tasks users chose to bring to Claude) cannot be applied to all task work as an average treatment
+effect.</strong> Selection into usage — people bring Claude precisely the tasks (and task-portions) where it
+is fast — is the dominant wedge between AEI-measured savings and Acemoglu's lab-calibrated input.</p>
+<p>The defensible headline is therefore:</p>
+<blockquote>
+<p>Replacing imputed exposure with measured eligibility and imputed savings with measured per-instance
+savings raises the bottom-up TFP estimate from 0.66% to <strong>3.6% at current usage incidence</strong>
+(adopter-ATT, not ATE) — and the gap between the 3.6% realized and 39% ceiling numbers is a
+measurement of how much selection-into-usage inflates naive extrapolations of observed AI
+productivity gains.</p>
+</blockquote>
+<h2>Caveats (pre-registered)</h2>
+<ul>
+<li>Adopter-ATT, not ATE: savings conditional on self-selected usage.</li>
+<li>Single AEI week (Nov 13–20, 2025); pool vintages before quoting levels externally.</li>
+<li>AEI durations are model-estimated (validated by Anthropic against lab studies, median abs. error
+  &lt; 7 minutes).</li>
+<li>Within-occupation wage bills apportioned by O*NET importance; 13 occupations with missing
+  importance filled at the global median.</li>
+<li>No input-output amplification (matches Acemoglu's task-based setup); labor share 0.6.</li>
+</ul>
+<h2>Next steps</h2>
+<ol>
+<li>Quality adjustment: weight savings by AEI task-success rates (a success-weighted ceiling).</li>
+<li>Pool the Aug'25/Feb'26 vintages for savings stability (W6 panel infrastructure already built).</li>
+<li>Selection bound: pair AEI per-instance savings with external ATE estimates (e.g., RCT literature)
+   to turn the bracket into a formal partial-identification interval.</li>
+<li>BEA input-output aggregation as a sensitivity.</li>
+</ol>
+<hr />
+<h2>Extensions (2026-06-10, notebooks/23_acemoglu_extensions.py)</h2>
+<p>Spec locked in PAPER_NOTES.md (W7 extension) before estimation. Outputs in
+<code>notebooks/output/acemoglu_upgrade/</code> (table_quality_adjusted, table_vintage_stability,
+table_selection_bounds, fig_selection_bounds).</p>
+<ol>
+<li><strong>Quality adjustment.</strong> Mean task success rate 75.6% (86% facet coverage). Success-weighting cuts
+   the ceiling 39.3% → <strong>29.7%</strong> (realized-now 3.65% → <strong>2.76%</strong>); the conservative variant (failures
+   also waste the AI interaction time) gives 28.7% / 2.66%.</li>
+<li><strong>Vintage stability.</strong> 1,876 tasks measured in both Nov-2025 and Feb-2026: per-task savings
+   correlate <strong>0.82</strong>; mean savings 89.9% vs 90.0%; headline ceiling drift <strong>−0.2%</strong> on the common
+   subsample. The single-week caveat is largely retired for the savings input. (Schema drift handled:
+   Feb-2026 appends <code>::value</code> to time-facet cluster names; extractor now vintage-proof.)</li>
+<li><strong>Selection bounds (partial identification).</strong> Replacing the per-instance 90% with external RCT
+   ATEs: realized-now TFP ∈ <strong>[0.58%, 3.65%]</strong> — and the lower bound (Brynjolfsson-Li-Raymond 14%
+   field estimate) essentially <em>recovers Acemoglu's 0.66%</em>. His number is the conservative-ATE corner
+   of the measured calculation. With the crude Domar factor (×1.9): [1.1%, 6.9%].</li>
+<li><strong>Is it showing up yet? (descriptive).</strong> Fernald utilization-adjusted TFP growth averaged
+   0.86%/yr over 2023–2026Q1 vs 0.47%/yr over 2010–2019 — a <strong>+0.39pp/yr gap, at/above the upper end</strong>
+   of the implied realized-now path (+0.06 to +0.36pp/yr). Three years, COVID-adjacent, no causal
+   claim — but measured TFP acceleration is in the right ballpark for the measured-inputs estimate,
+   and W4's "no detected break yet" remains true (this is increment drift, not a regime shift).</li>
+</ol>
+<p><strong>Updated headline:</strong> quality-adjusted, vintage-stable, selection-bounded realized-now TFP of
+<strong>[0.6%, 2.8%]</strong>, with Acemoglu's 0.66% as the conservative corner and current measured TFP drift
+consistent with the interval.</p>
+<hr />
+<h2>The wedge waterfall (2026-06-10, notebooks/24_savings_to_tfp_waterfall.py)</h2>
+<p>All wedges measured from AEI task facets (spec: PAPER_NOTES W7b; outputs: table_waterfall,
+table_wedge_vintages, fig_waterfall in <code>notebooks/output/acemoglu_upgrade/</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Mean eff. savings</th>
+<th>Ceiling TFP</th>
+<th>Realized-now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Per-instance savings (measured)</td>
+<td>90.0%</td>
+<td>39.4%</td>
+<td>3.65%</td>
+</tr>
+<tr>
+<td>2. × success rate 75.6% (quality wedge)</td>
+<td>67.8%</td>
+<td>29.7%</td>
+<td>2.76%</td>
+</tr>
+<tr>
+<td>3. × work share 46.3% (non-market wedge)</td>
+<td>33.5%</td>
+<td>15.4%</td>
+<td>1.43%</td>
+</tr>
+<tr>
+<td>4. × automation share 47.2% (verification LOWER bound)</td>
+<td>12.9%</td>
+<td>6.2%</td>
+<td>0.58%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Realized-now TFP band: [0.58%, 1.43%] — Acemoglu's 0.66% sits inside it.</strong> The verification-tax
+δ (how much augmentation-mode usage saves) is not identified; the band, not a point, is the honest
+object.</p>
+<p>Two standalone findings:
+- <strong>The non-market wedge: only 46.3% of task-level AI usage is work</strong> (34.7% personal, 19.0%
+  coursework). More than half of measured AI task activity produces surplus that will never appear
+  in TFP — first-order for interpreting any TFP-based AI assessment.
+- <strong>Wedges are vintage-stable</strong> (Nov→Feb: work 46.3%→45.4%, automation 47.2%→45.9%); the
+  verification tax is not yet shrinking.</p>
+<p>Reconciliation: the Fernald 2023–26 TFP drift (+0.39pp/yr) now sits ABOVE the decomposed band's
+ten-year path (+0.06 to +0.14pp/yr) — i.e., if the acceleration is real and AI-driven, it exceeds
+what the fully-wedged bottom-up calculation explains; descriptive, COVID-adjacent.</p>
+<hr />
+<h2>Tracking the wedges (2026-06-10, notebooks/25_verification_reinstatement.py)</h2>
+<ul>
+<li><strong>Verification tax over 14 months (5 vintages):</strong> automation share 42.6% → 45.9% net, but
+  non-monotonic and method-inconsistent across the v1/v2→v3 boundary; within the consistent v3
+  segment it FELL (51.6% Aug'25 → 45.9% Feb'26). <strong>The verification tax is not measurably falling</strong> —
+  plausibly a composition effect (usage expanding into harder, more collaborative tasks as capability
+  rises); shift-share decomposition queued.</li>
+<li><strong>Reinstatement, measured honestly:</strong> AEI's own taxonomy non-coverage is stable at ~7% of usage
+  (8.1→6.5→7.0). The earlier "13.7% unmatched = new tasks" reading is retracted: fuzzy-matching shows
+  median similarity 0.96 to O<em>NET 30.1 statements — it is mostly O</em>NET version drift.</li>
+</ul>
+<hr />
+<h2>The scaffolding dividend (2026-06-10, notebooks/26_scaffolding_dividend.py)</h2>
+<p>Same O*NET tasks, same model families, two deployment contexts (AEI 1P API = scaffolded production
+use vs Claude.ai consumer use), three vintages:</p>
+<ul>
+<li><strong>Within-task automation gap (API − consumer): +30.1pp usage-weighted</strong> (median +45.5pp; 89% of
+  1,322 common tasks more automated on API). Aggregate automation share: API 81–87% vs consumer
+  46–52%. Deployment context alone moves the verification tax by 30–45pp.</li>
+<li><strong>The flat/declining consumer automation share is NOT a composition artifact.</strong> Shift-share
+  (Aug'25→Feb'26): consumer within-task −3.8pp vs composition −1.9pp; API within −5.5pp vs −0.6pp.
+  Within the same task, interactions became MORE collaborative on both platforms while models
+  improved — candidate stories (user-base composition, complexity creep within task categories,
+  product-surface changes) are logged; the aggregates cannot separate them.</li>
+<li><strong>Waterfall implication:</strong> the API automation level is the measured headroom of scaffolding.
+  Shifting work usage to API-style deployment lifts the verification lower bound of realized-now TFP
+  from 0.58% to ≈1.0% with no model improvement — the scaffolding dividend is the near-term TFP
+  frontier, and it is already deployed in one segment of the market.</li>
+</ul>
+<hr />
+<h2>Completing the verification-tax story (2026-06-10, notebooks/27_decline_decomposition.py)</h2>
+<p><strong>Why is within-task automation falling?</strong> Not user composition. On consumer, within-task user-skill
+changes do nothing (+0.004, p=.59) while instance-complexity creep is real (tasks whose instances got
+bigger became less automated, −0.047, p=.035) and <em>growing</em> tasks became <em>more</em> automated. On API the
+complexity sign flips (+0.056): scaffolding converts bigger jobs into delegation; its decline is mostly
+an unexplained common drift (new agentic use-cases onboarding collaboratively / product mix).</p>
+<p><strong>The verifiability gradient.</strong> Consumer levels confirm the theory cleanly: automation 58% (verifiable)</p>
+<blockquote>
+<p>43% (middle) &gt; 32% (unverifiable). But the dividend is LARGEST for unverifiable tasks (+44pp vs
++26pp) and the API gradient is compressed — <strong>deployment context substitutes for machine-verifiability</strong>.
+The refined verification-tax claim: the tax binds at the interactive margin and is bought out
+wholesale by deployment infrastructure, not task-by-task by checkability.</p>
+</blockquote>
+<p><strong>Baumol-within, quantified:</strong> machine-verifiable tasks are only 14.7% of the wage bill (unverifiable
+11.5%, middle 73.8%). The TFP action is in the middle mass — which is exactly where the scaffolding
+dividend operates.</p>
+<div class="foot">Part of a research program on GPT transitions and productivity ·
+every specification locked before estimation · code repository private — available on request</div>
+</div>
+</body>
+</html>

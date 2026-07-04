@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results Memo — The Dynamics Extensions: Selection, Composition, the Measured J-Curve, and the First Adjudication (W10–W13)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ea;--paper-deep:#efe9db;--ink:#1d1a16;--ink-soft:#4d463c;
+--rule:#c9bfae;--oxblood:#7e2a23;--prussian:#1f3a5f;--gold:#9a7b2d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Source Serif 4",serif;font-size:16.5px;line-height:1.65}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+.crumb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+letter-spacing:.12em;text-transform:uppercase}
+.crumb a{color:var(--prussian);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;
+line-height:1.25;margin:18px 0 6px}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;
+margin:34px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:17.5px;
+margin:26px 0 8px}
+p,li{color:var(--ink-soft)}
+strong{color:var(--ink)}
+a{color:var(--prussian)}
+em{color:var(--ink-soft)}
+hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:13px;
+background:var(--paper-deep);padding:1px 5px;border-radius:2px}
+pre{background:var(--paper-deep);border-left:3px solid var(--gold);
+padding:12px 16px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:18px 0;font-size:14.5px;width:100%}
+th,td{border:1px solid var(--rule);padding:7px 11px;text-align:left;
+vertical-align:top}
+th{background:var(--paper-deep);font-family:"IBM Plex Mono",monospace;
+font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+blockquote{border-left:3px solid var(--rule);margin:16px 0;
+padding:2px 18px;color:var(--ink-soft)}
+.foot{margin-top:56px;border-top:1px solid var(--rule);padding-top:14px;
+font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="crumb"><a href="../index.html">&larr; Will AI show up in the productivity statistics?</a> &nbsp;·&nbsp; Memo · The Dynamics Extensions (W10–W13)</div>
+<h1>Results Memo — The Dynamics Extensions: Selection, Composition, the Measured J-Curve, and the First Adjudication (W10–W13)</h1>
+<p><em>2026-06-10. Workstreams W10–W13 + the W9 adjudication infrastructure. Code:
+<code>notebooks/29–32</code>, <code>src/{wedge_paths, w9_tracking, task_model (W11 ext), ai_economic_metrics
+(W12 ext), country_panel}.py</code>, <code>scripts/update_w9_adjudication.py</code>. Outputs:
+<code>notebooks/output/{selection_unwind, ge_task_model, aatfp_forward, country_panel}/</code>,
+<code>output/w9_adjudication/</code>. Pre-registered specs: PAPER_NOTES.md §§10 (addendum), 11–14, all
+locked and committed before estimation; post-lock decisions disclosed inline. Companion to
+<a href="memo_w9_dynamic_waterfall.html">MEMO_W9_dynamic_waterfall</a>.</em></p>
+<h2>The question</h2>
+<p>W9 produced a projected realized-TFP path with two free legs: the capability scenarios
+(parameterized, not forecast) and three stated-but-unmodeled limitations (selection unwind, GE
+composition, the capital-side accounting). The four extensions close those gaps with measured or
+explicitly-bounded machinery and stand up the apparatus that adjudicates the scenarios in public.
+The joint question: <strong>which W9 conclusions survive when its own caveats are modeled?</strong></p>
+<h2>1. Selection unwind (W10a): the long run halves; the near-term test survives</h2>
+<p>Mixture/ATT model: inframarginal usage keeps the measured 90% savings; marginal adopters earn the
+RCT-anchored ATE (central 27%, band 15–56%). Nests W9 exactly at s_RCT = 0.90; anchor and κ
+calibration untouched.</p>
+<table>
+<thead>
+<tr>
+<th>Central cell, verification lower bound</th>
+<th>S(2035), no unwind</th>
+<th>S(2035), unwind-27</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wedges flat</td>
+<td>5.3%</td>
+<td>2.4%</td>
+</tr>
+<tr>
+<td>Wedges unlock 2029</td>
+<td>12.6%</td>
+<td>5.8%</td>
+</tr>
+</tbody>
+</table>
+<p>The asymmetry is the finding: <strong>the 2027 coverage-channel prediction is robust to selection
+unwind</strong> (every central cell still crosses +0.5 pp/yr in 2027, because early acceleration is
+inframarginal — g_sel ≈ 1 while A ≈ A₀), while the long-run levels are not (the 2030 unlock peak
+damps 2.19 → 1.21 pp/yr). Selection is a levels problem, not a timing problem. W9's headline
+should now be quoted as a two-layer band: [unwind-27 lower envelope, W9 upper envelope].</p>
+<h2>2. The measured wedge movement (W10b): the first crack in "wedges flat"</h2>
+<p>The first wage-bill-weighted vintage table of the two unlockable wedges (consumer + API,
+Nov'25 → Feb'26, W6-weight-matched tasks, anchors asserted):</p>
+<table>
+<thead>
+<tr>
+<th>Wedge (consumer, wage-bill-weighted)</th>
+<th>Nov'25</th>
+<th>Feb'26</th>
+<th>Δ</th>
+<th>Pre-registered verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task success (quality)</td>
+<td>76.0%</td>
+<td>79.7%</td>
+<td><strong>+3.7pp</strong></td>
+<td><strong>FASTER than the unlock path</strong> (predicts +0.1pp)</td>
+</tr>
+<tr>
+<td>Automation share (verification)</td>
+<td>44.3%</td>
+<td>45.8%</td>
+<td>+1.55pp</td>
+<td>indistinguishable (±2pp band) — but positive</td>
+</tr>
+</tbody>
+</table>
+<p>This is the single most consequential new number. The quality wedge — the <em>model</em> channel in the
+§9 margin decomposition — is moving at roughly 15 pp/yr against an unlock parameterization that
+assumed nothing happens until 2028–29. Two readings, both recorded: (a) the capability unlock is
+arriving early, in which case the W9 "unlock" scenario is conservative on timing; (b) selection
+into easier tasks within the quarter (composition, not capability) — distinguishable in the next
+vintage by the success-by-complexity profile. Note the weighting matters: the usage-weighted
+automation series (W7c, tracked by the adjudication script) still reads flat-to-falling; the
+wage-bill-weighted series ticked up. Both are now tracked side by side.</p>
+<p>API panel: success 61.4% → 63.1% (15pp <em>below</em> consumer — scaffolded contexts attempt harder
+tasks), automation 92.9% → 91.3% wage-bill-weighted. <strong>W9's unlock target (0.85, usage-weighted)
+is conservative: the wage-bill-weighted API ceiling is ~0.92.</strong></p>
+<h2>3. GE on measured tasks (W11): the index is a good map, with three quantified corrections</h2>
+<p>The 2,707 measured tasks in a static CES economy, automation driven by the W9 wedge paths (not
+cost decline — W6), closed form, 64 paths. σ=1 reconciles with the W9 index within ~3% where
+S &lt; 5%; all anchors (W7b ceilings 1e-9, W7e class shares exact) hold.</p>
+<ol>
+<li><strong>The Baumol drag</strong> (σ = 0.5, unlock, lower bound): −0.26pp (2030), −1.77pp (2035), −2.77pp
+   (2040) of aggregate gain vs the fixed-share benchmark; −4.0pp at σ = 0.2 by 2040. Task
+   complementarity is a first-order <em>long-run</em> damper — same shape as selection: spares the
+   near-term, takes from the far end.</li>
+<li><strong>Jensen's correction, the other way:</strong> the exact CD aggregate rises <em>above</em> the linear index
+   as task-level cuts deepen (−ln λ convex); by 2035 σ=1 GE exceeds the index by 15% (lo) / 63%
+   (hi). The multiplicative index understates the exact aggregate at deep utilization — the two
+   corrections partially offset.</li>
+<li><strong>Composition and wages:</strong> the pre-registered Baumol-within-cognitive-work composition shift is
+   directionally confirmed and quantitatively second-order (+0.1pp unverifiable expenditure share
+   by 2035 — class-mean λ differences are diluted by work-share and utilization). No-mobility
+   wage bounds spread as predicted but mildly: verifiable 0.91, unverifiable 1.01 by 2035.</li>
+<li><strong>Labor share: flat, as pre-registered.</strong> At measured parity (~636×), AI's income claim is
+   ≤ 0.04% of sector cost in 2035. Displacement appears as task reallocation, not labor-share
+   decline — a sharp, falsifiable departure from capital-deepening intuitions.</li>
+</ol>
+<h2>4. The measured J-curve (W12): the trough is real in exactly the corners that matter</h2>
+<p>Increment-form residual: residual_AI(t) = ΔS(t) − α_AI·g_KAI(t) − β_AI·Δln(1+(μ−1)A(t)),
+120 combos (5 W9 corners × selection × 3 capex paths × 4 α_AI).</p>
+<ul>
+<li><strong>The permanent trough is live:</strong> the conservative corner never flips in any of its 24 combos;
+  42/120 combos never cross by 2040. "AI capex permanently outruns measured AI productivity" is a
+  real scenario, not a rhetorical one.</li>
+<li>The genuine J-curves are the verification-lower-bound central corners: crossover <strong>2030</strong>
+  (sustained capex, α = 0.05), 2029 (adoption-tied), and unwind-27 pushes it past 2040. The
+  hi-band corners flip immediately (no trough at all).</li>
+<li>Sensitivity ordering of the crossover year: <strong>W9 corner = α_AI (14-yr spread each) ≫ selection
+  (11) ≫ capex path (3)</strong>. What you assume about capability/verification and about the capital
+  elasticity matters; the capex path barely does.</li>
+<li><strong>The headline demolition:</strong> the income-share-consistent capital elasticity is α_AI(2026) =
+  0.0065 — 7.7× below the conventional 0.05. Measured capex/GDP (1.3%, δ = 0.25, r = 0.05)
+  supports a <strong>0.23pp</strong> capital drag today, not the 1.75pp our own AA-TFP dashboard (and the
+  public conversation) carries. Under decelerating capex it never reaches 0.02. Implication:
+  the measured J-curve trough is <em>shallow</em> — the "AI is dragging measured TFP down 1.75pp" story
+  overstates the input side by nearly an order of magnitude, which cuts both ways: less drag now,
+  but also less mechanical rebound later.</li>
+</ul>
+<h2>5. The monitoring layer: adjudication live, panel built, W8 resolved</h2>
+<ul>
+<li><strong>Adjudication script</strong> (<code>scripts/update_w9_adjudication.py</code>): mechanical, pre-registered corner
+  rule. First verdict: <strong>"flat wedges × free ceiling, coverage pending"</strong> — automation (usage-
+  weighted) 0.459 &lt; 0.48; the free-vs-L=0.5 diffusion horse race starts at BTOS wave 202612;
+  Fernald trailing 8q dtfp_util 0.24 vs the 1.87 pp/yr supporting threshold; coverage-channel
+  decision date <strong>2027Q4</strong>. Re-run per BTOS wave / AEI vintage.</li>
+<li><strong>W13 country panel:</strong> 461 country×vintage rows; the adoption gradient is near unit-elastic
+  (log-AUI on log-GDP/pc slope 1.03, R² = 0.81) and rank-stable across vintages (ρ = 0.971) —
+  monitorable, descriptive only by locked spec (the TFP covariates are pre-AI).</li>
+<li><strong>W8:</strong> kill criterion triggered — fetchable sources yield 1 city × 22 obs (SF 1849–70) vs the
+  required ≥2 × ≥25. The 1820–1870 window is publicly unacquirable; the pre-committed fallback
+  (Philadelphia via Bezanson ILL + UK validation + 1890+ NBER anchor) is operative; manual-entry
+  targets located to the page.</li>
+</ul>
+<h2>Joint reading</h2>
+<p>Stack the four extensions and the W9 scenario space compresses asymmetrically:</p>
+<ul>
+<li><strong>Robust:</strong> the 2027 coverage-channel test (survives selection, GE composition, and the
+  capital-side reaccounting — every damper is a long-run damper); the verification band as the
+  honest object; the adjudication dates (2027Q4, then each vintage).</li>
+<li><strong>Fragile:</strong> all long-run <em>levels</em>. S(2035) under {unwind × Baumol-σ=0.5} spans roughly 2–11%
+  where W9 alone said 5–17%. Anyone quoting the upper paths without the unwind and σ caveats is
+  now contradicting the program's own extensions.</li>
+<li><strong>Updated priors:</strong> the quality wedge moved a quarter after we parameterized it as flat — the
+  one direction W9's unlock scenario did not anticipate is <em>early</em> capability arrival; and the
+  capital-drag story everyone (including our dashboard) tells is ~7× too big on measured income
+  shares.</li>
+</ul>
+<h2>Limitations</h2>
+<p>W10's vintage test has one time-step (power arrives with each release); the unwind multiplier is
+aggregate (RCT anchors are not task-level); W11's σ is locked-but-assumed (0.5 primary) and its
+mobility cases are polar bounds; W12's findings are conditional on W9 corners by construction;
+W13 is descriptive by design. The adjudication rule is mechanical — corner flips trigger human
+[RESULT] entries, not automatic reinterpretation.</p>
+<div class="foot">Part of a research program on GPT transitions and productivity ·
+every specification locked before estimation · code repository private — available on request</div>
+</div>
+</body>
+</html>

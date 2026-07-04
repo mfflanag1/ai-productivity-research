@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Will AI Show Up in the Productivity Statistics?</title>
+<meta name="description" content="A research program on AI, general-purpose technologies, and total factor productivity — from 400 years of diffusion history to task-level usage data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f7f3ea;
+  --paper-deep:#efe9db;
+  --ink:#1d1a16;
+  --ink-soft:#4d463c;
+  --rule:#c9bfae;
+  --oxblood:#7e2a23;
+  --prussian:#1f3a5f;
+  --gold:#9a7b2d;
+  --max:1060px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Source Serif 4",Georgia,serif;
+  font-size:17.5px;line-height:1.62;
+  background-image:
+    radial-gradient(ellipse at 18% -5%, rgba(154,123,45,.06), transparent 55%),
+    radial-gradient(ellipse at 110% 30%, rgba(31,58,95,.05), transparent 50%);
+}
+/* faint paper grain */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .025 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+main,header,footer{position:relative;z-index:2}
+a{color:var(--prussian)}
+a:hover{color:var(--oxblood)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+
+/* ---------- masthead ---------- */
+header.masthead{padding:56px 0 0}
+.kicker{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-soft);
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  border-bottom:1px solid var(--ink);padding-bottom:10px;
+}
+h1.title{
+  font-family:"Fraunces",serif;font-weight:900;
+  font-size:clamp(40px,7.2vw,84px);line-height:.98;letter-spacing:-.015em;
+  margin:34px 0 18px;max-width:18ch;
+}
+h1 .q{color:var(--oxblood)}
+.dek{font-size:clamp(18px,2.2vw,22px);color:var(--ink-soft);max-width:62ch;font-weight:400}
+.byline{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft);margin-top:22px}
+
+/* ---------- hero numbers ---------- */
+.heronums{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  border-top:3px double var(--ink);border-bottom:1px solid var(--rule);
+  margin:42px 0 0;
+}
+.heronums>div{padding:26px 22px 22px;border-right:1px solid var(--rule)}
+.heronums>div:last-child{border-right:none}
+.bignum{
+  font-family:"Fraunces",serif;font-weight:600;font-variant-numeric:tabular-nums;
+  font-size:clamp(34px,4.4vw,52px);line-height:1;
+}
+.bignum small{font-size:.45em;font-weight:400;color:var(--ink-soft)}
+.numlabel{font-size:14px;color:var(--ink-soft);margin-top:10px;line-height:1.45}
+.heronums .n1 .bignum{color:var(--prussian)}
+.heronums .n2 .bignum{color:var(--ink)}
+.heronums .n3 .bignum{color:var(--oxblood)}
+.heronums .n4 .bignum{color:var(--gold)}
+
+/* ---------- sections ---------- */
+section{padding:74px 0 8px}
+.sec-label{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--paper);
+  display:inline-block;padding:5px 12px;margin-bottom:18px;
+}
+.arc-macro .sec-label{background:var(--oxblood)}
+.arc-micro .sec-label{background:var(--prussian)}
+.neutral .sec-label{background:var(--ink)}
+h2{
+  font-family:"Fraunces",serif;font-weight:600;font-size:clamp(28px,4vw,42px);
+  line-height:1.08;letter-spacing:-.01em;max-width:24ch;margin-bottom:16px;
+}
+.lede{font-size:19px;max-width:66ch;color:var(--ink-soft)}
+.prose{max-width:70ch;margin-top:14px}
+.prose p{margin:0 0 14px}
+.prose strong{font-weight:600}
+
+/* ---------- timeline cards ---------- */
+.steps{margin:38px 0 30px;border-left:2px solid var(--rule);padding-left:0;list-style:none}
+.step{
+  position:relative;padding:22px 0 26px 34px;border-bottom:1px dashed var(--rule);
+}
+.step:last-child{border-bottom:none}
+.step::before{
+  content:"";position:absolute;left:-7px;top:32px;width:12px;height:12px;
+  background:var(--paper);border:2.5px solid var(--accent,var(--ink));border-radius:50%;
+}
+.arc-macro .step{--accent:var(--oxblood)}
+.arc-micro .step{--accent:var(--prussian)}
+.neutral .step{--accent:var(--ink)}
+.step .when{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);
+  letter-spacing:.12em;text-transform:uppercase;
+}
+.step h3{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin:4px 0 8px}
+.step p{max-width:68ch;color:var(--ink-soft);font-size:16.5px}
+.step .finding{
+  font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);
+  background:var(--paper-deep);border-left:3px solid var(--accent);
+  padding:9px 14px;margin-top:12px;display:inline-block;max-width:62ch;
+}
+
+/* ---------- plates (figures) ---------- */
+.plate{margin:34px 0 10px;max-width:860px}
+.plate img{width:100%;border:1px solid var(--rule);background:#fff;display:block}
+.plate figcaption{
+  font-size:14px;color:var(--ink-soft);margin-top:9px;line-height:1.5;
+}
+.plate figcaption b{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:12.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.plates-row{display:grid;grid-template-columns:1fr 1fr;gap:26px;max-width:980px}
+@media(max-width:760px){.plates-row{grid-template-columns:1fr}}
+
+/* ---------- interactive waterfall ---------- */
+.waterfall{
+  margin:40px 0 8px;max-width:880px;background:#fffdf8;
+  border:1px solid var(--rule);padding:30px 28px 22px;
+  box-shadow:6px 6px 0 var(--paper-deep);
+}
+.wf-title{font-family:"Fraunces",serif;font-weight:600;font-size:20px;margin-bottom:4px}
+.wf-sub{font-size:14px;color:var(--ink-soft);margin-bottom:22px}
+.wf-row{display:grid;grid-template-columns:215px 1fr 86px;gap:14px;align-items:center;margin:0 0 13px}
+.wf-name{font-size:14.5px;line-height:1.3}
+.wf-name small{display:block;color:var(--ink-soft);font-size:12px}
+.wf-barwrap{height:30px;background:var(--paper-deep);position:relative;overflow:hidden}
+.wf-bar{
+  height:100%;background:var(--prussian);width:0;
+  transition:width 1.1s cubic-bezier(.25,.7,.2,1);
+  position:relative;
+}
+.wf-row:nth-child(odd) .wf-bar{background:#2c4f7c}
+.wf-row.band .wf-bar{background:repeating-linear-gradient(45deg,var(--gold),var(--gold) 6px,#b6964a 6px,#b6964a 12px)}
+.wf-row.final .wf-bar{background:var(--oxblood)}
+.wf-val{font-family:"IBM Plex Mono",monospace;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.wf-note{font-size:13px;color:var(--ink-soft);margin-top:14px;border-top:1px dashed var(--rule);padding-top:12px}
+.wf-row:hover .wf-name, .wf-row:hover .wf-val{color:var(--oxblood)}
+
+/* ---------- nulls ledger ---------- */
+.ledger{max-width:880px;margin:36px 0 10px;border:1.5px solid var(--ink);background:#fffdf8}
+.ledger-head{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;
+  text-transform:uppercase;padding:12px 18px;border-bottom:1.5px solid var(--ink);
+  display:flex;justify-content:space-between;background:var(--paper-deep);
+}
+.ledger-row{
+  display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
+  padding:16px 18px;border-bottom:1px solid var(--rule);
+}
+.ledger-row:last-child{border-bottom:none}
+.ledger-row .what{font-size:15.5px;max-width:62ch}
+.ledger-row .what b{font-weight:600}
+.stamp{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  border:2px solid var(--oxblood);color:var(--oxblood);
+  padding:4px 9px;transform:rotate(-3.5deg);white-space:nowrap;
+  text-transform:uppercase;font-weight:500;
+}
+
+/* ---------- papers ---------- */
+.papers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin:36px 0 8px;max-width:980px}
+.memo-shelf{margin:40px 0 8px;max-width:980px;border-top:2px solid var(--ink);padding-top:16px}
+.shelf-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.memo-row{padding:13px 0;border-bottom:1px dashed var(--rule)}
+.memo-row:last-child{border-bottom:none}
+.memo-row a{font-family:"Fraunces",serif;font-weight:600;font-size:17px;color:var(--ink);text-decoration:none}
+.memo-row a:hover{color:var(--oxblood)}
+.memo-hook{display:block;font-size:14px;color:var(--ink-soft);margin-top:3px;max-width:74ch}
+.paper-card{
+  border:1px solid var(--rule);background:#fffdf8;padding:24px 22px;
+  box-shadow:5px 5px 0 var(--paper-deep);
+  display:flex;flex-direction:column;gap:10px;
+}
+.paper-card .ptype{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft)}
+.paper-card h3{font-family:"Fraunces",serif;font-weight:600;font-size:19.5px;line-height:1.22}
+.paper-card p{font-size:14.5px;color:var(--ink-soft);flex:1}
+.paper-card a.btn{
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;text-decoration:none;
+  border:1.5px solid var(--ink);padding:7px 13px;display:inline-block;width:max-content;
+  color:var(--ink);transition:all .15s;
+}
+.paper-card a.btn:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- colophon ---------- */
+.colophon{
+  border-top:3px double var(--ink);margin-top:70px;padding:36px 0 60px;
+  font-size:14.5px;color:var(--ink-soft);
+}
+.colophon .wrap{display:grid;grid-template-columns:2fr 1fr;gap:40px}
+@media(max-width:760px){.colophon .wrap{grid-template-columns:1fr}}
+.colophon h4{font-family:"Fraunces",serif;color:var(--ink);font-size:17px;margin-bottom:8px}
+.colophon ul{list-style:none}
+.colophon li{margin-bottom:6px}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+
+/* ---------- reveal on scroll ---------- */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+hr.sep{border:none;border-top:1px solid var(--rule);max-width:var(--max);margin:60px auto 0}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="kicker">
+      <span>A Research Program · 2026</span>
+    </div>
+    <h1 class="title">Will AI show up in the productivity statistics<span class="q">?</span></h1>
+    <p class="dek">Four centuries of technology diffusion say cost barriers govern how fast new technologies spread — and that the biggest transitions announce themselves decades in advance. AI breaks both rules. This program measures, rather than predicts, what that means for growth.</p>
+    <p class="byline">Two arcs · thirteen working analyses · every specification locked before estimation · nulls published</p>
+
+    <div class="heronums">
+      <div class="n1 reveal">
+        <div class="bignum">90<small>%</small></div>
+        <div class="numlabel">measured time saved per AI-assisted task instance, across 2,063 occupational tasks</div>
+      </div>
+      <div class="n2 reveal">
+        <div class="bignum">0.6–1.4<small>%</small></div>
+        <div class="numlabel">realized TFP contribution at current adoption, after every measured wedge</div>
+      </div>
+      <div class="n3 reveal">
+        <div class="bignum">2027–34</div>
+        <div class="numlabel">conditional break window at AI's measured adoption speed — raw historical lags say the 2050s</div>
+      </div>
+      <div class="n4 reveal">
+        <div class="bignum">+30<small>pp</small></div>
+        <div class="numlabel">within-task automation headroom of scaffolded deployment over interactive use</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================== ARC I ================== -->
+<section class="arc-macro" id="macro">
+  <div class="wrap">
+    <span class="sec-label">Arc I · The Macro Record, 1605–2026</span>
+    <h2>What four hundred years of transitions teach — and where AI exits the script</h2>
+    <p class="lede">Built on Philippon's additive-growth result, the Bergeaud–Cette–Lecat productivity panel, and an 80-technology diffusion archive, the macro arc asks whether general-purpose-technology transitions can be detected — or even foreseen — in aggregate data.</p>
+
+    <ol class="steps">
+      <li class="step reveal">
+        <span class="when">The law</span>
+        <h3>Cost barriers set diffusion speed, elasticity ≈ −1</h3>
+        <p>Across 30 technologies from newspapers (1605) to mobile phones (1983), the cost barrier at launch predicts how fast a technology spreads. The relationship survives placebo, jackknife, and permutation tests.</p>
+        <span class="finding">log k = −3.93 − 1.08 · log B &nbsp;·&nbsp; R² = 0.46 · N = 30</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The warning signal</span>
+        <h3>Broad transitions announce themselves; wars don't</h3>
+        <p>The three decades before electrification-era productivity breaks show rising variance — critical slowing down, borrowed from ecology. Wars and financial crises show the opposite. The signature replicates before the steam transition in data reaching back to 1770.</p>
+        <span class="finding">electrification τ = +0.23 vs. wars/crises τ &lt; 0 · Mann-Whitney p = 0.002</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The verdict on IT</span>
+        <h3>The IT revolution showed no signal — because of scope, not speed</h3>
+        <p>The natural objection was that IT diffused too fast for annual data. Quarterly utilization-adjusted TFP rules that out: no signal there either, and simulations show annual data would have caught an IT-speed transition 80% of the time. IT genuinely never approached a critical transition.</p>
+        <span class="finding">quarterly var τ = −0.36 (p=.69) · annual power at IT speed = 0.80</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The honest detector</span>
+        <h3>"Detectable in retrospect" is not "detectable in real time"</h3>
+        <p>Turned into a causal detector with no hindsight, the signal weakens: it fires before wars more often than before the transitions it is meant to announce. The early-warning claim holds for populations of breaks, not yet as an operational instrument. As of 2019, the detector is quiet.</p>
+        <span class="finding">backtest AUC = 0.63, CI spans 0.5 · steam out-of-sample: France only</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The conditional clock</span>
+        <h3>If AI is electrification-like, the break is decades out — unless lags scale with speed</h3>
+        <p>Measured against the right input-cost series, the historical lags from cost-threshold crossing to productivity break are 50, 40, and 35 years (steam, electrification, IT). Applied to a 2023 crossing: no aggregate break before the mid-2030s, more plausibly the 2050s. But a lag is diffusion time plus reorganization time, and it should compress with diffusion speed: at AI's measured adoption rate (k ≈ 0.40–0.52, vs 0.04–0.37 for the historical eras) the steam and electrification analogies move to 2028–2034. Only the IT analogy stays mid-century.</p>
+        <span class="finding">raw lags 50 / 40 / 35 yrs → 2050s · speed-scaled at measured k → 2028–2034</span>
+      </li>
+    </ol>
+
+    <div class="plates-row">
+      <figure class="plate reveal">
+        <img src="assets/fig9_sampling_power.png" alt="Detection power: quarterly vs annual sampling" loading="lazy">
+        <figcaption><b>Plate I</b> — Detection power for fast transitions: annual data was never the problem; the IT null is about scope.</figcaption>
+      </figure>
+      <figure class="plate reveal">
+        <img src="assets/fig_31st_observation.png" alt="AI as the 31st observation on the cost-barrier law" loading="lazy">
+        <figcaption><b>Plate II</b> — AI as the 31st observation: its cost barrier falls below every technology in four centuries; observed adoption speed sits inside the predictive band.</figcaption>
+      </figure>
+    </div>
+    <figure class="plate reveal">
+      <img src="assets/fig_timeline.png" alt="Historical threshold-to-break lags and AI scenarios" loading="lazy">
+      <figcaption><b>Plate III</b> — Cost-threshold crossings → TFP breaks: the measured lags, and the conditional AI scenarios they imply.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ================== ARC II ================== -->
+<section class="arc-micro" id="micro">
+  <div class="wrap">
+    <span class="sec-label">Arc II · The Micro Anatomy, 2024–2026</span>
+    <h2>Ninety percent per task. One percent in the aggregate. Every wedge in between, measured.</h2>
+    <p class="lede">Task-level usage records — millions of AI conversations classified into occupational tasks, with measured durations, success rates, purposes, and interaction modes — let the standard aggregate calculation be rebuilt from measured inputs instead of imputed ones.</p>
+
+    <ol class="steps">
+      <li class="step reveal">
+        <span class="when">Price exits</span>
+        <h3>Cost no longer binds — and the null is precise</h3>
+        <p>The median task costs 636× more done by a human than by the model. Between data vintages, commodity-tier model prices collapsed 92%; task-level usage composition didn't move. The design would have detected an elasticity of 0.03. The historical law is −1. Thirty-five times the detectable effect: nothing.</p>
+        <span class="finding">FD elasticity −0.009 [−0.030, +0.012] · permutation p = 0.45 · MDE 0.031</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The waterfall</span>
+        <h3>From measured savings to realized TFP</h3>
+        <p>Per-instance savings of 90% shrink through measured wedges — task success (76%), the non-market share of usage (half of it isn't work), the human-in-the-loop share — and adoption incidence, to a realized contribution of 0.6–1.4%. Acemoglu's famous 0.66% bound emerges as the conservative corner of the measured calculation.</p>
+        <span class="finding">realized band [0.6%, 1.4%] · independent surveys (Fed, Denmark) land inside it</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The headroom</span>
+        <h3>Deployment, not capability, is the near-term frontier</h3>
+        <p>The same task, the same week, two contexts: scaffolded API traffic is 30 points more delegated than interactive consumer use — in 89% of common tasks. Where production harnesses absorb bigger jobs, delegation rises with complexity; in chat, it falls. The binding constraint is deployment infrastructure, which production contexts already have.</p>
+        <span class="finding">within-task gap +30.1pp (median +45.5) · API 85% vs consumer 47% delegated</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">The twist</span>
+        <h3>Verification is bought wholesale, not task by task</h3>
+        <p>Interactive users delegate where outputs are machine-checkable — a clean 58/43/32 gradient. But the deployment headroom is <em>largest</em> where outputs can't be checked mechanically. Production contexts move verification downstream instead of refusing to delegate — which matters, because checkable tasks are only 15% of the wage bill.</p>
+        <span class="finding">headroom: +44pp unverifiable vs +26pp verifiable · verifiable work = 14.7% of wage bill</span>
+      </li>
+    </ol>
+
+    <!-- interactive waterfall -->
+    <div class="waterfall reveal" id="waterfall">
+      <div class="wf-title">The measured waterfall</div>
+      <div class="wf-sub">Aggregate TFP-equivalent at full usage of measured tasks; hover any stage. Final row applies measured adoption incidence.</div>
+      <div class="wf-row" data-w="39.4"><div class="wf-name">Per-instance savings <small>what usage logs measure: 90% time saved</small></div><div class="wf-barwrap"><div class="wf-bar"></div></div><div class="wf-val">39.4%</div></div>
+      <div class="wf-row" data-w="29.7"><div class="wf-name">× task success <small>75.6% of attempts succeed</small></div><div class="wf-barwrap"><div class="wf-bar"></div></div><div class="wf-val">29.7%</div></div>
+      <div class="wf-row" data-w="15.4"><div class="wf-name">× market-work share <small>half of usage is personal or coursework</small></div><div class="wf-barwrap"><div class="wf-bar"></div></div><div class="wf-val">15.4%</div></div>
+      <div class="wf-row band" data-w="6.2"><div class="wf-name">× verification band <small>lower bound credits only delegated usage</small></div><div class="wf-barwrap"><div class="wf-bar"></div></div><div class="wf-val">6.2–15.4%</div></div>
+      <div class="wf-row final" data-w="1.4"><div class="wf-name">× adoption incidence <small>≈9% of work hours AI-assisted</small></div><div class="wf-barwrap"><div class="wf-bar"></div></div><div class="wf-val">0.6–1.4%</div></div>
+      <div class="wf-note">Bars scaled to the 39.4% ceiling. The ceiling itself is a diagnostic of selection — users bring AI the tasks it is good at — not a forecast. Experimental lower bounds tell the same story from the other side.</div>
+    </div>
+
+    <div class="plates-row">
+      <figure class="plate reveal">
+        <img src="assets/fig2_waterfall.png" alt="The measured waterfall" loading="lazy">
+        <figcaption><b>Plate IV</b> — The waterfall as published: each stage is a measured task-level wedge aggregated through wage bills.</figcaption>
+      </figure>
+      <figure class="plate reveal">
+        <img src="assets/fig3_bounds_incidence.png" alt="Selection bounds and the incidence curve" loading="lazy">
+        <figcaption><b>Plate V</b> — Bounds under experimental savings inputs (left); realized TFP as a function of adoption incidence (right).</figcaption>
+      </figure>
+    </div>
+    <div class="plates-row">
+      <figure class="plate reveal">
+        <img src="assets/fig4_dividend.png" alt="The scaffolding dividend distribution" loading="lazy">
+        <figcaption><b>Plate VI</b> — The deployment headroom: distribution of within-task automation gaps, API minus consumer.</figcaption>
+      </figure>
+      <figure class="plate reveal">
+        <img src="assets/fig5_gradient.png" alt="The verifiability gradient" loading="lazy">
+        <figcaption><b>Plate VII</b> — The verifiability gradient: textbook in chat, nearly flat in production.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ================== SYNTHESIS ================== -->
+<section class="neutral" id="forward">
+  <div class="wrap">
+    <span class="sec-label">The Synthesis · Where the Two Arcs Meet</span>
+    <h2>The wedges have speeds. Propagating them forward names the dates.</h2>
+    <p class="lede">The micro anatomy measures every wedge's level; the macro arc asks when a break could come. The dynamic waterfall joins them: each wedge given its measured trajectory — adoption from Census diffusion curves, the task-reliability frontier from METR's horizon-doubling law, verification and quality wedges under flat-vs-unlock scenarios — and propagated into a realized-TFP path for 2026–2040. The capability scenarios are parameterizations, not forecasts; everything else is fit to data on disk, and every path starts exactly at the measured 0.6–1.4% band.</p>
+
+    <ol class="steps">
+      <li class="step reveal">
+        <span class="when">The saturated frontier</span>
+        <h3>Adopters already use AI on nearly everything it's currently reliable for</h3>
+        <p>Calibrating today's realized band against the task-reliability frontier implies adopting firms utilize 93–99% of the task-hours where AI clears an 80%-reliability bar. The eligible-task margin is exhausted. Growth cannot come from deeper use of feasible tasks — only from the extensive adoption margin and from verification practice.</p>
+        <span class="finding">implied frontier utilization κ = 0.93–0.99 · the dynamic restatement of the anatomy's constraint ordering</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">Two dates</span>
+        <h3>Every projected path peaks in 2027 or in 2030</h3>
+        <p>Across the admissible parameter grid, peak acceleration lands on exactly two dates. 2027, if capability-horizon growth converts to realized output at its measured doubling rate — a falsifiable prediction the quarterly TFP detector adjudicates within eight quarters. 2030, if instead the verification and quality wedges begin to move. And in the conservative corner — flat wedges, slow diffusion — realized TFP plateaus below 1.5% and no detectable increment ever arrives: the transition stays permanently inside the measurement wedges. Stress-testing the projections from both sides leaves the timing intact and the levels lower: letting per-instance savings decay toward the experimental estimates as adoption broadens roughly halves the long-run paths without touching the 2027 test, and a general-equilibrium version on the same measured tasks adds a Baumol drag of up to two points by 2035 — both are long-run dampers; neither moves the dates.</p>
+        <span class="finding">peak increment +1.4–3.8 pp/yr in 2027 (coverage channel) · +2.2 pp/yr in 2030 (wedge unlock) · selection unwind: levels halve, dates hold · Baumol drag (σ=0.5): −1.8pp by 2035</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">Convergent clocks</span>
+        <h3>Independent machinery lands in the same window</h3>
+        <p>The speed-scaled historical analogies (steam and electrification at AI's measured adoption rate: 2028–2034), the dynamic waterfall's two clusters (2027, 2030), and the measured J-curve — AI capital booked against realized AI productivity, with crossovers at 2029–2030 in exactly the verification-bound scenarios — come from different data and different arithmetic, and name the same half-decade. The 2050s headline survives only on raw, unscaled lags or on the IT analogy. The J-curve accounting also revises a widely-cited number: at an income-share-consistent capital elasticity, measured AI capex supports a drag on TFP of 0.2 points, not the 1.75 points the conventional elasticity implies — the investment-phase trough commonly described is real but nearly an order of magnitude shallower.</p>
+        <span class="finding">speed-scaled analogies 2028–2034 · dynamic-waterfall clusters 2027 / 2030 · J-curve crossovers 2029–2030 (42/120 scenarios never) · capex drag 0.2pp, not 1.75pp</span>
+      </li>
+      <li class="step reveal">
+        <span class="when">First reading</span>
+        <h3>The adjudication is live — and the first vintage moved</h3>
+        <p>The scenarios are now adjudicated mechanically against three pre-registered tripwires: the wedge vintages, the adoption curve, and the quarterly TFP detector. The first reading is in, and it surprised in one direction: wage-bill-weighted task success jumped from 76.0% to 79.7% in a single quarter — several times faster than the capability-unlock parameterization predicted — while the verification wedge stayed inside its noise band. The quality wedge is moving before the verification wedge. The standing verdict updates with every Census adoption wave and usage vintage; the coverage-channel prediction faces its decision date in 2027Q4.</p>
+        <span class="finding">success wedge +3.7pp in one quarter (criterion: ≥+2pp ⇒ faster than unlock) · automation +1.5pp, inside noise · current verdict: flat wedges × free ceiling, coverage pending</span>
+      </li>
+    </ol>
+
+    <div class="plates-row">
+      <figure class="plate reveal">
+        <img src="assets/fig_dynamic_waterfall.png" alt="Dynamic waterfall: realized-TFP paths and implied increment paths" loading="lazy">
+        <figcaption><b>Plate VIII</b> — The dynamic waterfall: realized-TFP paths from the measured anchor (left) and the implied growth increments the detector would see (right), flat wedges vs unlock-by-2029.</figcaption>
+      </figure>
+      <figure class="plate reveal">
+        <img src="assets/fig_break_sensitivity.png" alt="Break-timing sensitivity across the parameter grid" loading="lazy">
+        <figcaption><b>Plate IX</b> — Peak-increment timing across the parameter grid: the 2027 coverage cluster, the 2030 unlock cluster, and the never-detectable conservative corner below the 0.5 pp/yr line.</figcaption>
+      </figure>
+    </div>
+    <div class="plates-row">
+      <figure class="plate reveal">
+        <img src="assets/fig_wedge_vintages.png" alt="Measured wedge vintages vs the unlock parameterization" loading="lazy">
+        <figcaption><b>Plate X</b> — The first adjudication: the two unlockable wedges, measured by vintage, against the unlock-2029 path (dashed). Success is already above it; the verification wedge isn't moving yet. Scaffolded API contexts (squares) sit 15 points below consumer on success and 45 above on delegation.</figcaption>
+      </figure>
+      <figure class="plate reveal">
+        <img src="assets/fig_jcurve_fan.png" alt="The measured J-curve: AA-TFP residual paths" loading="lazy">
+        <figcaption><b>Plate XI</b> — The measured J-curve: the AI residual (realized productivity minus booked AI inputs) across 120 scenarios. Crossovers cluster at 2029–2030 in the verification-bound corners; 42 scenarios never cross, so a permanent trough is one of the live outcomes.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ================== NULLS ================== -->
+<section class="neutral" id="nulls">
+  <div class="wrap">
+    <span class="sec-label">The Registry of Nulls</span>
+    <h2>Findings that didn't survive — published anyway</h2>
+    <p class="lede">Specifications are logged before estimation, so the results that didn't hold stay on the record alongside the ones that did. They're collected here.</p>
+
+    <div class="ledger reveal">
+      <div class="ledger-head"><span>Entry</span><span>Disposition</span></div>
+      <div class="ledger-row"><div class="what"><b>The IT early-warning signal.</b> No critical-slowing-down signature before 1995 at any frequency, with demonstrated power. Became the scope-not-speed verdict.</div><span class="stamp">Null · Published</span></div>
+      <div class="ledger-row"><div class="what"><b>The real-time detector.</b> AUC 0.63 with a confidence interval spanning chance; fires before wars more than before GPT transitions. The paper now says so.</div><span class="stamp">Weak · Published</span></div>
+      <div class="ledger-row"><div class="what"><b>The cost-pillar mechanism.</b> Cognitive vs. energy vs. coordination channels unidentified — 12 intensity profiles among 30 technologies cannot separate three collinear cost series. Needs measurement, not econometrics.</div><span class="stamp">Unidentified</span></div>
+      <div class="ledger-row"><div class="what"><b>The task-level price elasticity.</b> A 92% price collapse moved usage composition by nothing — the null that became the "cost no longer binds" result.</div><span class="stamp">Null · Promoted</span></div>
+      <div class="ledger-row"><div class="what"><b>The verification prediction.</b> The pre-registered "delegation expands where outputs are checkable" prediction failed in production data — replaced by the wholesale-verification finding.</div><span class="stamp">Refuted · Revised</span></div>
+      <div class="ledger-row"><div class="what"><b>"13.7% of AI tasks are new tasks."</b> Retracted on inspection: O*NET version drift (median text similarity 0.96), not task creation. The honest series is ~7% of usage outside the taxonomy.</div><span class="stamp">Retracted</span></div>
+      <div class="ledger-row"><div class="what"><b>The 1.75pp AI capital contribution.</b> Our own dashboard's parameterization (α=0.05, 35% capex growth). At an income-share-consistent elasticity, measured capex/GDP supports 0.23pp. The headline number — ours included — overstates the input side ~7×.</div><span class="stamp">Revised · Own number</span></div>
+      <div class="ledger-row"><div class="what"><b>Baumol-within-cognitive-work, in GE.</b> The pre-registered composition shift (unverifiable tasks' expenditure share rises as verifiable ones automate) is directionally confirmed and quantitatively negligible: +0.1pp by 2035. The drag on TFP is real; the composition channel carrying it is second-order at these horizons.</div><span class="stamp">Confirmed · Negligible</span></div>
+      <div class="ledger-row"><div class="what"><b>US regional coal prices, 1820–1870.</b> The pre-committed kill criterion triggered: an exhaustive fetchable-source campaign yielded one city (San Francisco, 22 obs). The window is publicly unacquirable without archival transcription; the fallback design is on the books, targets located to the page.</div><span class="stamp">Unacquirable · Logged</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ================== PAPERS ================== -->
+<section class="neutral" id="papers">
+  <div class="wrap">
+    <span class="sec-label">Papers &amp; Artifacts</span>
+    <h2>Read the work</h2>
+
+    <div class="papers">
+      <div class="paper-card reveal">
+        <div class="ptype">Working paper · Macro arc</div>
+        <h3>From Cost Decline to Productivity Transition</h3>
+        <p>The cost-barrier law, critical slowing down before broad transitions, the quarterly resolution of the IT puzzle, the honest detector, and the conditional AI timing window. Subsumes the program's earlier early-warning and diffusion-speed papers.</p>
+        <a class="btn" href="assets/unified_paper.pdf">PDF →</a>
+      </div>
+      <div class="paper-card reveal">
+        <div class="ptype">Working paper · Micro arc</div>
+        <h3>The Measured Anatomy of AI's Economic Impact</h3>
+        <p>Every input of the aggregate AI-productivity calculation measured from task-level usage data: the waterfall, the bounds, the deployment headroom, and the verifiability twist.</p>
+        <a class="btn" href="assets/measured_anatomy.pdf">PDF →</a>
+      </div>
+      <div class="paper-card reveal">
+        <div class="ptype">The full trail</div>
+        <h3>The research log, in the open</h3>
+        <p>Every specification locked before estimation, every result, surprise, disclosed post-lock decision, and retraction — the dated trail behind every number on this page. Working to-dos and queued ideas are redacted; everything evidentiary is kept. (The code repository is private; available on request.)</p>
+        <a class="btn" href="memos/research_log.html">Read the log →</a>
+      </div>
+    </div>
+
+    <div class="memo-shelf reveal">
+      <div class="shelf-label">The memo shelf — the working layer between the log and the papers</div>
+      <div class="memo-row"><a href="memos/memo_w10_w13_dynamics.html">The Dynamics Extensions (W10–W13)</a><span class="memo-hook">What survives when the projection's own caveats are modeled: levels halve, the 2027 test holds, the quality wedge is already moving, and the capex-drag headline shrinks 7×.</span></div>
+      <div class="memo-row"><a href="memos/memo_w9_dynamic_waterfall.html">The Dynamic Waterfall (W9)</a><span class="memo-hook">From the static band to a projected path: every wedge given its measured speed; peak years cluster at 2027 and 2030.</span></div>
+      <div class="memo-row"><a href="memos/memo_p4_acemoglu_upgrade.html">The Acemoglu Upgrade (W7)</a><span class="memo-hook">The famous 0.66% recomputed with measured inputs — and why the bracket, not either endpoint, is the finding.</span></div>
+      <div class="memo-row"><a href="memos/memo_p1_task_parity.html">Task-Level Cost Parity (W6)</a><span class="memo-hook">The cross-section behind "cost no longer binds": a 636× parity gap and a precisely-measured zero elasticity.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== COLOPHON ================== -->
+<footer class="colophon">
+  <div class="wrap">
+    <div>
+      <h4>Method, briefly</h4>
+      <p>Specifications are locked in a project log before estimation, with deviations disclosed. Inference prefers surrogate and permutation nulls over asymptotics where designs are small or dependent. Bands are reported where parameters are not identified. Independent measurements — Census firm surveys, Fed worker surveys, Danish administrative data, randomized experiments — are used to bound what usage logs alone cannot.</p>
+      <p style="margin-top:10px">Data: Bergeaud–Cette–Lecat productivity panel · Penn World Tables · Maddison Project · Fernald quarterly TFP · NBER–Comin–Hobijn diffusion archive · historical cost series (Nordhaus, Fouquet, Allen) · Anthropic Economic Index (five public vintages) · O*NET · OES · Census BTOS.</p>
+    </div>
+    <div>
+      <h4>Cite</h4>
+      <p class="mono">Flanagan, M. (2026).<br>“Will AI Show Up in the Productivity Statistics?”<br>Research program site.</p>
+      <p class="mono" style="margin-top:14px">Built as a single static page.<br>No trackers. No framework.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// scroll reveals
+const io = new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// waterfall bars animate when visible, scaled to ceiling 39.4
+const wf = document.getElementById('waterfall');
+const wfIO = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting) return;
+    wf.querySelectorAll('.wf-row').forEach((row,i)=>{
+      const w = parseFloat(row.dataset.w)/39.4*100;
+      setTimeout(()=>{ row.querySelector('.wf-bar').style.width = Math.max(w,1.5)+'%'; }, 150*i);
+    });
+    wfIO.unobserve(wf);
+  });
+},{threshold:.35});
+wfIO.observe(wf);
+</script>
+</body>
+</html>

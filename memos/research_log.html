@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper Research Notes — running log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ea;--paper-deep:#efe9db;--ink:#1d1a16;--ink-soft:#4d463c;
+--rule:#c9bfae;--oxblood:#7e2a23;--prussian:#1f3a5f;--gold:#9a7b2d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Source Serif 4",serif;font-size:16.5px;line-height:1.65}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+.crumb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+letter-spacing:.12em;text-transform:uppercase}
+.crumb a{color:var(--prussian);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;
+line-height:1.25;margin:18px 0 6px}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;
+margin:34px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:17.5px;
+margin:26px 0 8px}
+p,li{color:var(--ink-soft)}
+strong{color:var(--ink)}
+a{color:var(--prussian)}
+em{color:var(--ink-soft)}
+hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:13px;
+background:var(--paper-deep);padding:1px 5px;border-radius:2px}
+pre{background:var(--paper-deep);border-left:3px solid var(--gold);
+padding:12px 16px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:18px 0;font-size:14.5px;width:100%}
+th,td{border:1px solid var(--rule);padding:7px 11px;text-align:left;
+vertical-align:top}
+th{background:var(--paper-deep);font-family:"IBM Plex Mono",monospace;
+font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+blockquote{border-left:3px solid var(--rule);margin:16px 0;
+padding:2px 18px;color:var(--ink-soft)}
+.foot{margin-top:56px;border-top:1px solid var(--rule);padding-top:14px;
+font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="crumb"><a href="../index.html">&larr; Will AI show up in the productivity statistics?</a> &nbsp;·&nbsp; The Research Log — locked specifications, results, surprises</div>
+<h1>Paper Research Notes — running log</h1>
+<p><em>Public rendering note: working to-do entries and queued/unstarted research ideas are redacted from this page. Locked specifications, results, surprises, disclosed decisions, and retractions are complete.</em></p>
+<p>Running research log for the four workstreams extending the unified paper
+(<code>papers/unified_paper/paper.tex</code>). Background reference: <a href="PROJECT_NOTES.md">PROJECT_NOTES.md</a>.</p>
+<p><strong>Entry types:</strong> <code>[DECISION]</code> what/why/alternatives rejected · <code>[RESULT]</code> numbers + spec + seed/vintage
+· <code>[SURPRISE]</code> anything contradicting expectations.</p>
+<p>Dated entries, newest at top within each section.</p>
+<hr />
+<h2>0. Cross-workstream</h2>
+<h3>Data vintages in use</h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Vintage</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fernald quarterly TFP</td>
+<td>produced 2026-06-04, downloaded 2026-06-09, data through 2026:Q1</td>
+<td><code>data/productivity/fernald_quarterly_tfp.xlsx</code></td>
+</tr>
+<tr>
+<td>BCL database</td>
+<td>(existing, used by papers A/B/unified)</td>
+<td><code>data/bcl_database.xlsx</code></td>
+</tr>
+<tr>
+<td>Epoch AI models</td>
+<td>refreshed 2026-06-09, 3,537 models through 2026-06-04 (schema changed: 6 cost columns removed, loader verified; old vintage at /tmp/epoch_backup_apr.csv)</td>
+<td><code>data/ai_costs/epoch_ai_models.csv</code></td>
+</tr>
+<tr>
+<td>Anthropic Economic Index</td>
+<td>Jan 2026 (STALE — 90 MB raw, refresh deferred)</td>
+<td><code>data/ai_exposure/anthropic_economic_index/</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Shared conventions</h3>
+<ul>
+<li>Annual CSD analysis (published): pre-break window 30 yrs, EWS rolling window 15 yrs, gaussian detrending with AICc bandwidth, Kendall tau + AR(1) surrogate p (n=1000), one-sided alpha=0.05.</li>
+<li>All windows in EWS code are <strong>observation counts</strong>, frequency-agnostic.</li>
+<li>Seeds: surrogates/placebos use seed=42 unless logged otherwise.</li>
+</ul>
+<h3>Inter-workstream implications</h3>
+<ul>
+<li>(none yet)</li>
+</ul>
+<h3>Pre-commit review outcome (2026-06-09)</h3>
+<ul>
+<li>Methodology review of all new modules (quarterly_csd, realtime_detector, pillar_identification,
+  data_loader/monte_carlo extensions, 4 test files): <strong>no high-severity issues</strong>; BH, AUC tie-handling,
+  cluster bootstrap, studentized permutation, no-look-ahead guarantee, and aggregation math all verified.</li>
+<li>Paper-numbers audit (~60 claims vs CSV ground truth): one factual error found and fixed ("Britain
+  produces no alarms at all" → GBR has one alarm at 1900, outside the pre-steam window; text corrected);
+  conclusion timing sentence now explicitly anchored to the 2023 threshold crossing. All other claims
+  match within rounding; all figure symlinks valid; both new bib keys present.</li>
+</ul>
+<h3>Methods caveats from pre-commit review (2026-06-09, quality review — no high-severity issues found)</h3>
+<ul>
+<li>BH q-values in the spec grids pool strongly dependent specifications (same data, overlapping windows,
+  quarterly+annual) into one family; BH assumes independence/PRDS, so the q-values are approximate, not
+  an exact FDR guarantee. If a referee asks: report per-family raw p alongside (already done).</li>
+<li><code>label_gpt_approach</code> positives are GPT pre-windows even when they also fall within <code>lead</code> years of a
+  non-GPT break (overlapping windows are not resolved); matches the stated definition.</li>
+<li>Detector "lead time" = break year minus the EARLIEST in-window alarm (most generous reading) — stated
+  here so paper text never implies time-from-last-alarm.</li>
+</ul>
+<hr />
+<h2>1. W1: Quarterly speed test of the IT puzzle</h2>
+<p><strong>Question:</strong> Does the CSD variance signal appear before the ~1995 IT-era TFP break at quarterly
+frequency where it is absent annually? Discriminates the unified paper Section 7 hypotheses:
+SPEED (signal exists, compressed below annual resolution) vs SCOPE (no signal at any frequency).</p>
+<h3>Pre-registered specification — LOCKED 2026-06-09, before any primary run</h3>
+<ul>
+<li><strong>Series:</strong> <code>dtfp_util</code> (utilization-adjusted business-sector TFP growth, annualized %, =400·Δlog), sample 1947:Q2–2019:Q4 (pre-COVID truncation; full sample is a sensitivity).</li>
+<li><strong>Break date:</strong> Bai-Perron estimate nearest 1995 on cumulated log level of dtfp_util; fallback if no break found in 1993–2004: Fernald (2014) published 1995:Q4 treated as known break (fallback use will be logged).</li>
+<li><strong>Pre-break window:</strong> 120 quarters (30 yrs). <strong>EWS rolling window:</strong> 60 quarters (15 yrs). Identical time spans to the published annual analysis at 4x sampling density — the equivalence is the test.</li>
+<li><strong>Detrending:</strong> gaussian, AICc-selected bandwidth (record selected value).</li>
+<li><strong>Indicators:</strong> rolling variance and rolling lag-1 autocorrelation of detrended increments.</li>
+<li><strong>Inference:</strong> Kendall tau; <strong>AR(1) surrogate p (n=1000, seed=42) is the reportable p-value</strong> (naive Kendall p invalid with ~91 overlapping rolling points; shown for comparability only). One-sided (rising), alpha=0.05.</li>
+<li><strong>Annual mirror:</strong> publisher's own <code>annual</code> sheet (same xlsx), identical test at pre=30, ews=15.</li>
+<li><strong>Negative control:</strong> pre-1973:Q1 window at pre=100, ews=40 (only ~104 quarters exist; pre-specified deviation).</li>
+<li><strong>Secondary pre-specified hypotheses (own raw p, not grid members):</strong> (a) sectoral <code>dtfp_I_util</code> before its ~1995 break — sharpest predicted signal under SPEED; (b) variance-ratio variant var(TFP)/var(GDP growth) to net out Great Moderation/recession volatility common to both.</li>
+<li><strong>Sensitivity grid (BH-corrected within indicator family):</strong> series {dtfp, dtfp_util} × frequency {quarterly, annual} × pre {80,100,120}q / {20,25,30}y × ews {20,40,60}q / {10,15}y.</li>
+<li><strong>Interpretation map (decided up front):</strong>
+  | Quarterly | Annual | MC power at quarterly | Verdict |
+  |---|---|---|---|
+  | signal | null | yes | SPEED confirmed — headline |
+  | null | null | yes | SCOPE favored |
+  | null | null | no | underpowered; lean on MC |
+  | signal | signal | — | contradicts published annual null → investigate BCL-vs-Fernald data difference first |</li>
+</ul>
+<h3>Decision log</h3>
+<ul>
+<li>2026-06-09 <code>[DECISION]</code> Truncate at 2019:Q4 for primary. Why: COVID quarters (±10pp annualized swings) would dominate any variance window; mirrors BCL truncation at 2019 in the published analysis. Full sample kept as sensitivity.</li>
+<li>2026-06-09 <code>[DECISION]</code> Do NOT reuse <code>detect_critical_slowing_down</code> for quarterly data — it mixes index units (pre_window) with observation counts (ews_window). New observation-count API in <code>src/quarterly_csd.py</code> instead; annual mirror runs through the same functions.</li>
+<li>2026-06-09 <code>[DECISION]</code> 1990–91 recession sits at the end of the pre-1995 window and can mechanically inflate late-window rolling variance (bigger threat at quarterly frequency than the Great Moderation, which biases AGAINST finding rising variance and so makes a positive result conservative). Required robustness: variance-ratio variant, winsorized increments (1/99 pct), pre-window ending 1990:Q2. Signal must survive.</li>
+</ul>
+<h3>Data notes (V1 — format verification, 2026-06-09)</h3>
+<ul>
+<li>Source URL: <code>https://www.frbsf.org/wp-content/uploads/quarterly_tfp.xlsx</code> (vintage produced 2026-06-04).</li>
+<li>Sheets: <code>readme</code>, <code>quarterly</code>, <code>annual</code>, <code>Capital-input-details</code>.</li>
+<li><code>quarterly</code>: header at excel row 2 (<code>header=1</code> in pandas). Valid data rows match <code>^\d{4}:Q[1-4]$</code> in <code>date</code>; 317 rows, 1947:Q1–2026:Q1; footer contains period-mean summary rows (must filter). 1947:Q1 is NaN (first diff).</li>
+<li>Columns (both sheets): <code>date, dY_prod, dY_inc, dY, dhours, dLP, dk, dLQ_BLS_interpolated, dLQ_Aaronson_Sullivan, dLQ, alpha, dtfp, dutil, dtfp_util, relativePrice, invShare, dtfp_I, dtfp_C, du_invest, du_consumption, dtfp_I_util, dtfp_C_util</code>.</li>
+<li>Units: percent change at annual rate = 400·Δ(natural log).</li>
+<li><strong>Bonus:</strong> utilization-adjusted sectoral series <code>dtfp_I_util</code>/<code>dtfp_C_util</code> exist → use these for the sectoral test (better than raw <code>dtfp_I</code>).</li>
+<li><strong>Anchor:</strong> Fernald's own footer regime dating: 1947:1–1973:1, 1973:1–1995:4, 1995:4–2004:4, 2004:4–2019:4 → published breaks at 1973:Q1, 1995:Q4, 2004:Q4, 2019:Q4. Our Bai-Perron should reproduce ~1973 and ~1995 within tolerance.</li>
+<li><code>annual</code> sheet: <code>header=0</code>, <code>date</code> = integer year, 1947–2025. Readme confirms annualization = cumulate quarterly growth to index, average within calendar year, log-difference (this is our <code>level_avg</code> method).</li>
+<li>Mean dtfp 1.20%, mean dtfp_util 1.23% (annualized) over full sample — sane.</li>
+</ul>
+<h3>Results log</h3>
+<ul>
+<li>
+<p>2026-06-09 <code>[RESULT]</code> <strong>V6 break detection (pre-primary):</strong> Bai-Perron (max_breaks=5, compute_ci=False) on cumulated log level of quarterly <code>dtfp_util</code>, 1947:Q2–2019:Q4: one break at <strong>1971.0</strong> (trim 0.15 and 0.10 agree) — within tolerance of Fernald's published 1973:Q1. <strong>No break detected in 1993–2004</strong>, and none at all for <code>dtfp_I_util</code>. Interpretation: quarterly growth is very noisy (mean shifts ~1pp vs quarterly innovation std ~3–4pp), so sequential sup-F loses power relative to annual data. <strong>Pre-registered fallback invoked:</strong> primary break date = 1995:Q4 (1995.75), Fernald (2014) regime dating, treated as known break. The detected 1971.0 anchors the pre-1973 negative control.</p>
+</li>
+<li>
+<p>2026-06-09 <code>[RESULT]</code> <strong>PRIMARY (S3) + annual mirror (S4):</strong> quarterly <code>dtfp_util</code>, break 1995:Q4, pre=120q, ews=60q, gaussian bw=19, n_surr=1000, seed=42 → <strong>var tau = −0.356 (surrogate p=0.686), AC tau = −0.599 (p=0.852)</strong>. Annual mirror (publisher annual sheet, pre=30, ews=15, bw=8) → var tau = −0.667 (p=0.860), AC tau = +0.188 (p=0.451). <strong>No CSD signal at either frequency; variance was FALLING before the IT break.</strong> Annual mirror independently reproduces the published annual IT null (published IT/GFC category mean τ=−0.36 in BCL data; Fernald gives −0.667) — good cross-dataset consistency.</p>
+</li>
+<li>
+<p>2026-06-09 <code>[RESULT]</code> Placebo distribution (n=200, pre=120q, ews=60q): mean var tau = −0.291 (p5 −0.863, p95 +0.786). Placebo taus are negative on average — the Great Moderation's economy-wide volatility decline pulls all post-1977 windows down. Observed primary tau (−0.356) sits mid-distribution: unremarkable, not even unusually negative.</p>
+</li>
+<li>
+<p>2026-06-09 <code>[RESULT]</code> <strong>Full run complete (notebooks/15_quarterly_speed_test.py, 2.5 min, seed=42). VERDICT: SCOPE HYPOTHESIS FAVORED.</strong></p>
+</li>
+<li>Negative control (pre-1973:Q1, pre=100q, ews=40q): var tau = −0.630 (p=0.923) — consistent with published slowdown findings.</li>
+<li>Placebos (n=154 feasible): observed primary var tau at 60th pct, AC tau at 6th pct — unremarkable.</li>
+<li>Confounds: raw dtfp var tau −0.401 (p=0.718); var(TFP)/var(GDP) ratio tau −0.270 (p=0.924) — the null is NOT a Great-Moderation masking artifact; winsorized −0.360 (p=0.687); window ending 1990:Q1 flips to +0.536 but p=0.203.</li>
+<li>Sectoral: dtfp_I_util (IT-producing) var tau +0.067 (p=0.468), AC tau −0.463 (p=0.762); dtfp_C_util control all negative. Even the sector where the 1995 break is sharpest shows no buildup.</li>
+<li>Spec grid (28 specs): variance q&lt;0.05 in <strong>0</strong> of 28 after BH.</li>
+<li>MC power (500 sims/width, calibrated sigma_q=0.0074, b 0.0014→0.0050): at IT-speed buildup (48q = 12 yrs), power_any quarterly = <strong>0.88</strong>, annual = <strong>0.80</strong>; var-only quarterly 0.63 vs annual 0.63. At electrification width (176q) quarterly 0.89, annual 0.89.</li>
+<li>Per the pre-registered interpretation map (null/null/adequate-power row): <strong>IT did not approach a critical transition. The published annual IT null is real, not a sampling artifact.</strong> Supports Gordon (2016) narrow-IT view; sharpens the paper's theory — CSD precedes broad GPT transitions, and its absence before IT is informative, not a measurement failure.</li>
+</ul>
+<h3>Surprises / anomalies</h3>
+<ul>
+<li>2026-06-09 <code>[SURPRISE]</code> The headline hope (quarterly signal + annual null → SPEED confirmed) did not materialize — the result went the other way, and cleanly.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> <strong>The MC undermines the speed hypothesis's own premise:</strong> annual sampling already has 0.80 power (any-indicator) at a 12-year IT-speed buildup in the calibrated model. Quarterly adds little for variance (0.63 vs 0.63); the gain is in AC (0.71 vs 0.46). "IT diffused too fast for annual data" was never quantitatively plausible at these noise levels.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> Short pre-windows (80q, i.e. 1975–1995) show strongly POSITIVE AC taus (+0.61 to +0.84) with raw surrogate p ≈ 0.03–0.04 — but they die under BH (q=0.37), flip sign at pre=120q, and have no variance counterpart (var taus strongly negative in the same windows). Treat as fragile/window-specific; report in robustness, do not claim.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> The 1990:Q1-ending window flips var tau positive (+0.536, p=0.203, ns) — the primary's negative tau partly reflects the quiet early-1990s quarters. Window sensitivity to report, not a signal.</li>
+</ul>
+<h3>Limitations / TODO</h3>
+<h3>Paper integration queue</h3>
+<hr />
+<h2>2. W2: Real-time detector</h2>
+<p><strong>Question:</strong> Paper A claims the GPT/non-GPT distinction is "detectable in real time" but never builds
+the detector. Operationalize it: a sliding-window, trailing-only (no look-ahead) CSD detector backtested
+over the full panel with ROC/AUC and false-alarm rates, validated out-of-sample on the steam transition,
+then applied to current data for AI. W1 conditions the interpretation: the detector can only announce an
+electrification-like (broad, slow) transition — an IT-like one produces no signal by construction.</p>
+<h3>Pre-registered specification — LOCKED 2026-06-09, before any backtest run</h3>
+<ul>
+<li><strong>Detector at (country, t), trailing-only:</strong> last 30 TFP increments ending at t (require full window);
+  gaussian detrend with AICc bandwidth fit on that window ONLY (no future data); rolling variance and
+  AC(1) with 15-obs windows; Kendall tau of each indicator → scores <code>var_tau(t)</code>, <code>ac_tau(t)</code>.
+  Mirrors the published 30/15 convention but computed causally.</li>
+<li><strong>Data/labels (backtest):</strong> BCL panel ≤2019 (paper convention); breaks = per-country Bai-Perron
+  (max_breaks=5, trim 0.15), categories from <code>classify_breaks</code> (electrification 1910–1935 = GPT class).
+  <strong>Positive label:</strong> country-years t with an electrification break at B and t ∈ [B−20, B).
+  <strong>Negative:</strong> all other country-years (including pre-non-GPT-break years and WWII — that is the point).
+  Lead sensitivity: 10 and 30 years.</li>
+<li><strong>Primary metric:</strong> AUC of <code>var_tau</code> (positives vs negatives), country-cluster bootstrap (1000 draws)
+  for the CI. Secondary: <code>ac_tau</code> AUC, mean-rank combination.</li>
+<li><strong>Operating point:</strong> threshold = 90th percentile of <code>var_tau</code> among negatives (10% FPR by construction).
+  Report: per-break hit rate (≥1 alarm in the 20y pre-break window) for GPT vs non-GPT breaks; lead-time
+  distribution; false-alarm rate in quiet periods (no break within 20y).</li>
+<li><strong>Out-of-sample (historical):</strong> identical detector + BCL-calibrated threshold on Maddison log GDP/capita
+  increments, GBR/FRA/NLD, 1700–1900. Success criterion: alarm clustering in the pre-steam window
+  (1780–1830) above the quiet-period rate. No retuning.</li>
+<li><strong>Present-day application:</strong> (a) detector paths 1980–2019 for all BCL countries (primary; ≤2022
+  exploratory — BCL includes COVID years which are exogenous-shock turbulence, not CSD);
+  (b) Fernald quarterly trailing detector (window 120q, ews 60q) — primary value at 2019:Q4, exploratory
+  path to 2026:Q1 with 2020:Q1–2021:Q4 winsorized at the 1/99 pct of the pre-2020 distribution;
+  (c) trailing 30y Kendall tau of cross-country dispersion (<code>cross_std</code> from
+  <code>compute_cross_sectional_dispersion</code>) — the strongest published pre-electrification signal (τ=+0.56).</li>
+<li><strong>Interpretation guardrail (from W1):</strong> a quiet detector today does NOT mean no AI transition — it means
+  no electrification-like approach is visible yet. State this wherever present-day results are reported.</li>
+</ul>
+<h3>Decision log</h3>
+<ul>
+<li>2026-06-09 <code>[DECISION]</code> This is a fixed-rule detector, NOT a trained classifier. With effectively one
+  GPT event in the BCL panel (electrification), any fitted model would train and test on the same event.
+  The decision rule (tau thresholds) is taken from the published retrospective analysis; the only
+  calibrated quantity is the alarm threshold, set mechanically at 10% FPR. Steam serves as the genuine
+  out-of-sample event. Alternatives rejected: probit/ML on pooled panel (circular), leave-one-country-out
+  (countries share the event, not independent).</li>
+<li>2026-06-09 <code>[DECISION]</code> Trailing gaussian detrending refit at every t: the published pipeline detrends
+  the full window retrospectively; a real-time detector must not see the future. This makes backtest AUC
+  an honest estimate of deployable performance.</li>
+</ul>
+<h3>Results log</h3>
+<ul>
+<li>2026-06-09 <code>[RESULT]</code> <strong>Full backtest complete (notebooks/16_realtime_detector.py, 0.7 min, seed=42).</strong>
+  Breaks: 77 across 19 countries (23 electrification, 16 slowdown, 16 it_gfc, 12 wwii, 10 other).
+  Detector panel: 2,300 causal (country, year) scores.</li>
+<li><strong>Primary AUC (var_tau, lead=20): 0.628, cluster-bootstrap CI [0.433, 0.833]</strong> — above chance in
+    point estimate, but the CI spans 0.5. ac_tau AUC 0.539 [0.411, 0.661]. Lead 10/30 nearly identical.</li>
+<li><strong>Operating point (threshold 0.783 = 10% FPR):</strong> quiet false-alarm rate 0.097 (calibration works).
+    Per-break hit rates: electrification 0.50 (6/12 with coverage), <strong>wwii 0.75, other 0.70</strong>, it_gfc 0.50,
+    slowdown 0.06. Electrification lead times 5–13 years.</li>
+<li><strong>OOS steam (BCL threshold, no retuning):</strong> alarm rate 0.078 in 1780–1830 vs 0.053 outside — weak;
+    driven entirely by FRA (0.30, first alarm 1825); GBR 0.00, NLD 0.07.</li>
+<li><strong>Present day:</strong> 1/23 BCL countries above threshold as of 2019 (0/23 as of 2022); US quarterly
+    trailing var_tau −0.683 at 2019:Q4 (+0.078 through 2026:Q1 COVID-winsorized); cross-country
+    dispersion trailing tau +0.039 at 2019. <strong>No electrification-like approach signature visible now.</strong></li>
+</ul>
+<h3>Surprises / anomalies</h3>
+<ul>
+<li>2026-06-09 <code>[SURPRISE]</code> <strong>The causal detector does NOT discriminate GPT from war breaks at a usable
+  operating point</strong> — it fires before WWII breaks (0.75) and "other" breaks (0.70) MORE often than before
+  electrification breaks (0.50). The published retrospective differential (group mean taus differ,
+  p=0.002) is real but does not translate into single-indicator real-time GPT-specificity. Paper A's
+  abstract claim "the distinction is detectable in real time" needs substantial qualification.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> Retrospective vs causal gap on steam: the published retrospective steam taus
+  were huge (+0.70 to +0.83, p&lt;0.001) but the causal trailing detector barely fires (GBR: zero alarms in
+  1780–1830). Two structural reasons: (1) retrospective windows end exactly at the (hindsight-known) break
+  and detrend with full-window information; (2) the 30-year warm-up means detector coverage starts late
+  (BCL: 1920, so 11 of 23 electrification breaks have no pre-break coverage at all). The signal exists;
+  the causal single-threshold operationalization loses most of it.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> US quarterly AC tau is +0.567 at 2019:Q4 while var tau is −0.683 — the two
+  indicators currently disagree for the US. Watch, don't over-read (W1 showed AC-only signals without
+  variance counterparts are fragile).</li>
+</ul>
+<h3>Limitations / TODO</h3>
+<h3>Paper integration queue</h3>
+<ul>
+<li><code>[NOTE]</code> Paper A (papers/paper_a_early_warning/paper.tex) still contains the unqualified "detectable
+  in real time" abstract claim — if Paper A is ever submitted separately, it needs the same correction.</li>
+</ul>
+<hr />
+<h2>3. W3: Pillar-intensity identification</h2>
+<p><strong>Question:</strong> Paper B's three-pillar decomposition fails (R² 0.77 but all pillar p &gt; 0.20) because the
+pillar barriers share one dominant time trend. Rajan-Zingales-style fix: identify pillar effects from the
+INTERACTION of cross-technology intensity variation with pillar cost levels at launch, absorbing the
+common trend with a launch-year control. If it works, we learn WHICH input cost drives diffusion speed —
+the quantity an AI forecast actually needs. If it fails, N=22 cross-tech variation is insufficient and
+the mechanism stays unidentified (an honest strengthening of Paper B's existing caveat).</p>
+<h3>Pre-registered specification — LOCKED 2026-06-09, before any estimation</h3>
+<ul>
+<li><strong>Intensity weights:</strong> the per-technology cognitive/energy/coordination weights in <code>_TECH_CATALOG</code>
+  (<code>src/paper_data_prep.py:33-167</code>). <strong>Crucially these were fixed when Paper B was written, long before
+  W3 was conceived</strong> — they cannot have been reverse-engineered to make this regression work.</li>
+<li><strong>Data:</strong> exact Paper B pipeline — <code>classify_hccta_technologies</code> → <code>fit_logistic_by_country</code> →
+  <code>aggregate_diffusion_speeds</code> (k_median per technology); <code>prepare_cost_panel_for_paper</code> for raw pillar
+  cost indices at launch year (NOT the barrier components, which embed task weights and era-level
+  inheritance discounts — those are absorbed by the trend/era controls instead).</li>
+<li><strong>Primary specification (OLS, N≈22):</strong>
+  log k_j = α + δ·(L_j − 1900)/100 + β_C·[w_jC·log p_C(L_j)] + β_E·[w_jE·log p_E(L_j)] + β_X·[w_jX·log p_X(L_j)] + ε_j
+  The launch-year trend absorbs the common cost decline; β_p is identified only if technologies intensive
+  in pillar p diffused systematically slower when that pillar was expensive at their launch,
+  over and above the trend. Hypothesis: β_p &lt; 0 for pillars that matter.</li>
+<li><strong>Inference (small N, no asymptotics):</strong> pairs bootstrap (2,000 draws) percentile CIs; placebo
+  permutation test (1,000 draws) permuting the WEIGHT TRIPLES across technologies — if identification is
+  real, breaking the tech-weight link must destroy the coefficients. Leave-one-out coefficient ranges.</li>
+<li><strong>Success criterion (per pillar):</strong> bootstrap 95% CI excludes 0 AND permutation p &lt; 0.05 AND
+  LOO sign-stable. Anything less → report as unidentified.</li>
+<li><strong>Sensitivities:</strong> era fixed effects instead of linear trend; drop mobile phones (Paper B's most
+  influential obs); coarse primary-pillar dummy (argmax weight) × own-pillar log cost; no-trend variant
+  (to reproduce/diagnose the original Paper B failure within the same dataset).</li>
+</ul>
+<h3>Decision log</h3>
+<ul>
+<li>2026-06-09 <code>[DECISION]</code> Use raw pillar cost indices at launch interacted with catalog weights, not the
+  <code>compute_structural_barrier</code> pillar components: the barrier components multiply in era-level
+  inheritance discounts (steam 0/0/0, electricity .1/.2/.15, IT .4/.55/.4) that are collinear with any
+  era control and would contaminate the interaction. Rejected alternative: country×technology panel with
+  country-level historical pillar costs — the data do not exist before ~1900 outside a few cities.</li>
+<li>2026-06-09 <code>[DECISION]</code> Permutation statistic = STUDENTIZED coefficient (|t| with classical SEs inside
+  each permuted fit), not the raw coefficient: under permutation the true signal moves into the residual
+  and inflates raw-beta dispersion, costing power. Studentization pivots that out; the permutation itself
+  supplies exactness. Decided on SYNTHETIC data (unit test exposed the power loss: known β_E=−2 recovered
+  exactly but raw-beta permutation p=0.05) — locked before any real-data estimation. Raw-beta p reported
+  alongside for transparency; add-one p-value correction used.</li>
+</ul>
+<h3>Results log</h3>
+<ul>
+<li>2026-06-09 <code>[RESULT]</code> <strong>Full run complete (notebooks/17_pillar_identification.py, seeds=42). VERDICT:
+  NO PILLAR IDENTIFIED — the mechanism behind the cost-speed elasticity remains unidentified, and the
+  intensity-interaction design is now ruled out as a rescue at this sample size.</strong></li>
+<li>Dataset: 30 tech observations (24 distinct), 1605–1983, catalog weights merged with pillar costs at launch.</li>
+<li>Diagnostic (no trend control): z_E −0.84 [−1.35, −0.51], z_X −0.85 [−1.57, −0.27] "significant" —
+    but this is just the common cost trend reloading onto the pillars (Paper B's original problem).</li>
+<li><strong>PRIMARY (trend + interactions):</strong> z_C −0.07 [−0.39, +0.17] perm p=0.98; z_E −0.64 [−1.13, +1.08]
+    perm p=0.37; z_X −0.43 [−1.33, +1.20] perm p=0.73. R²=0.57 (vs 0.54 trend-free simple barrier).</li>
+<li>Sensitivities: era FE, drop-mobile, primary-pillar dummies — all CIs include 0 everywhere.</li>
+<li>Leave-one-out: no pillar sign-stable.</li>
+<li>Every pillar fails all three legs of the pre-registered criterion.</li>
+</ul>
+<h3>Surprises / anomalies</h3>
+<ul>
+<li>2026-06-09 <code>[SURPRISE]</code> The deeper diagnosis: the catalog intensity weights provide too little
+  INDEPENDENT variation — only 12 distinct weight triples among 30 observations, weights cluster by era
+  (energy-heavy techs are old: corr(launch, w_C)=+0.36, corr(launch, w_E)=−0.17), and the interactions
+  inherit the time trend (corr(z_E, trend)=−0.28). Rajan-Zingales designs work with hundreds of
+  industry×country cells; 30 technologies with semi-collinear intensities cannot separate three cost
+  channels. The fix would be more granular intensity measurement (e.g., engineering input shares per
+  technology), not more econometrics.</li>
+</ul>
+<h3>Paper integration queue</h3>
+<hr />
+<h2>4. W4: AI break prediction refresh</h2>
+<p><strong>Question:</strong> When should an AI-driven TFP break appear, if one is coming? Notebook 12's current
+prediction (2058, 90% CI [2056, 2059]) is built on a degenerate base: <code>estimate_historical_lags</code> ran all
+three historical GPTs against the COGNITIVE cost series, but steam and electrification are energy-driven —
+no threshold crossing is found in their windows and the function silently defaults to lag=0, leaving
+N=1 usable lag (IT, 35 yrs) and an absurdly tight bootstrap CI. W4 fixes the lag base, refreshes the data,
+and reframes the prediction conditionally on the W1/W2 findings.</p>
+<h3>Pre-registered specification — LOCKED 2026-06-09, before notebook 18 first run</h3>
+<ul>
+<li><strong>Pillar-appropriate lag estimation (the core fix):</strong> Steam/Railways and Electrification lags computed
+  on the ENERGY cost index; IT (and AI) on the COGNITIVE services cost index. No src changes needed:
+  call <code>estimate_historical_lags</code> per-GPT with the matching cost series and single-entry <code>known_gpts</code>.
+  Threshold rule unchanged (10-yr rolling mean log-cost decline ≤ −3%/yr, first crossing in the event
+  window); sensitivity at −2%/yr and −5%/yr. <code>threshold_year == break_year</code> is treated as NOT FOUND and
+  excluded with a note (never as lag=0).</li>
+<li><strong>Data vintages:</strong> Epoch AI refreshed 2026-06-09 (3,537 models through 2026-06-04; schema changed —
+  six cost columns removed, loader verified working). AEI stays at Jan 2026 vintage (90 MB raw; refresh
+  deferred — staleness noted wherever used). BCL USA TFP ≤2019.</li>
+<li><strong>AI threshold year:</strong> both (a) the existing assumption 2023 and (b) a data-derived crossing from the
+  Epoch-based AI cost index under the same −3%/yr rule, if the index supports it. Report both.</li>
+<li><strong>Uncertainty = scenarios, not pooled CIs.</strong> With N≤3 lags, bootstrap CIs are theater. Report:
+  (i) raw historical lag range applied to the AI threshold year; (ii) diffusion-speed-scaled lags
+  (lag_j × k_era_j / k_AI, with era k from Paper B medians — steam 0.04, electrification 0.11, IT 0.37 —
+  and k_AI = 0.155 from the AEDD ADVI estimate), reflecting that faster diffusion compresses the lag;
+  (iii) the notebook-12 mean-lag method retained for comparison only.</li>
+<li><strong>Conditional framing (W1/W2 guardrails):</strong> every prediction is conditional on the AI transition being
+  electrification-like (broad). If IT-like, W1 implies no aggregate critical transition and possibly only
+  sector-level breaks — stated alongside every number. W2 adds: the CSD detector would currently be quiet
+  either way; it cannot adjudicate yet.</li>
+<li><strong>Explicitly rejected:</strong> formal survival analysis on N=3 events (earlier W4 sketch) — decorative
+  rigor; scenario logic is more honest.</li>
+</ul>
+<h3>Decision log</h3>
+<h3>Results log</h3>
+<ul>
+<li>2026-06-09 <code>[RESULT]</code> <strong>Full run complete (notebooks/18_ai_break_refresh.py).</strong></li>
+<li><strong>The pillar fix works: 3 usable lags</strong> (steam 50 yrs on energy costs: 1780→1830; electrification
+    40 yrs on energy costs: 1880→1920; IT 35 yrs on cognitive costs: 1960→1995), identical across all
+    three decline rules (−2/−3/−5%/yr). The monotone lag compression (50→40→35) matches the
+    diffusion-acceleration story. Notebook 12 had effectively N=1.</li>
+<li><strong>Scenarios (threshold = 2023):</strong> A raw-lag range → break <strong>2058–2073</strong>; B diffusion-speed-scaled
+    (k_AI=0.155) → <strong>2035–2106</strong> (wide: the IT-scaled lag is 84 yrs because k_IT=0.37 &gt; k_AI);
+    C mean-lag bootstrap on corrected base → <strong>2051, 90% CI [2043, 2059]</strong> — vs notebook 12's
+    2058 [2056, 2059] / adoption-adjusted 2047 [2045, 2048]. CI properly ~10x wider.</li>
+<li>Epoch vintage 2026-06-04 (3,537 models); AEI Jan-2026 adoption proxy 31.7%.</li>
+</ul>
+<h3>Surprises / anomalies</h3>
+<ul>
+<li>2026-06-09 <code>[SURPRISE]</code> The data-derived AI threshold crossing comes out at <strong>2000</strong>, not 2023: the
+  cognitive cost index's 10-yr rolling decline has been below −3%/yr more or less continuously since the
+  computing era began, so the crossing rule cannot separate an "AI event" from the ongoing computing cost
+  decline. The assumed 2023 threshold (LLM task-substitution, from the CCFI cost-parity work) is the
+  economically meaningful anchor; the 2000 variant is reported as a sensitivity (break window 2035–2050
+  under raw lags — i.e., possibly imminent). This ambiguity is itself a finding: "when did AI's cost
+  threshold cross" is not well-defined by cost-decline rates alone.</li>
+<li>2026-06-09 <code>[SURPRISE]</code> Scenario B cuts both ways: scaling IT's 35-yr lag by k_IT/k_AI = 0.37/0.155
+  STRETCHES it to 84 yrs (AI is diffusing slower than the PC by the ADVI estimate). The
+  popular intuition "AI is fast, so the break comes sooner" is not supported by the project's own
+  diffusion-speed estimate.</li>
+</ul>
+<h3>Paper integration queue</h3>
+<hr />
+<h2>5. W5: AI as the 31st observation (RESEARCH_DIRECTIONS Project 2)</h2>
+<p><strong>Question:</strong> Out of sample, does Paper B's cost-barrier→diffusion-speed elasticity (−0.95, N=30)
+predict AI's diffusion speed? Full design: <a href="RESEARCH_DIRECTIONS.md">RESEARCH_DIRECTIONS.md</a> §4.</p>
+<h3>Pre-registered specification — LOCKED 2026-06-10, BEFORE computing any observed k</h3>
+<ul>
+<li><strong>Frozen model:</strong> the Paper B simple regression log(k_median) = α + β·log(barrier_total), re-estimated
+  on the exact 30-observation dataset via the existing pipeline (<code>estimate_cross_technology_regression</code>)
+  with an ASSERTION that coefficients match the published α=−3.627, β=−0.953 before AI is scored.</li>
+<li><strong>AI barrier construction (locked before looking at any adoption data):</strong> one new row through the
+  unchanged <code>compute_structural_barrier</code>: launch_year=2022 (ChatGPT), gpt_era='it' (inheritance
+  0.4/0.55/0.4 — primary; sensitivity: a hypothetical 'ai' era extrapolating the inheritance trend),
+  distribution_type='bits', weights cognitive/energy/coordination = 0.7/0.1/0.2 (mirrors Personal
+  Computers, the nearest catalog precedent; sensitivity 0.5/0.2/0.3 = mobile-phone-like). Cost panel
+  extended past 2000 for the 2022 lookup with pillar normalization (p_max) FROZEN at the paper panel's
+  values — verified by asserting the 30 original barriers are unchanged to 6 decimals.</li>
+<li><strong>Prediction:</strong> k̂_AI = exp(α + β·log(B_AI)) with the standard OLS out-of-sample 90% predictive
+  interval (t(n−2), s·sqrt(1 + x0'(X'X)⁻¹x0) on the log scale).</li>
+<li><strong>Observed k (computed only after the above):</strong> (a) PRIMARY: logistic fit to Census BTOS firm
+  AI-adoption series (public; fetcher in scripts/update_aedd.py), free ceiling and fixed-ceiling
+  {20%, 50%, 100%} variants — early-curve speed/ceiling confounding reported, not hidden;
+  (b) SECONDARY: the program's ADVI estimate k=0.155 (already on the books, AEDD);
+  (c) TERTIARY: manual adoption signals in data/adoption/manual_signals.json.</li>
+<li><strong>Exhibit:</strong> Paper B scatter with AI as a starred 31st point and the predictive band.</li>
+<li><strong>Honest-failure clause:</strong> k_AI=0.155 is on the books; if observed k falls outside the band, that is
+  the result — a caveat to the unified paper, not a reason to revisit the barrier construction.</li>
+</ul>
+<h3>Decision log</h3>
+<h3>Results log</h3>
+<h3>Surprises / anomalies</h3>
+<h3>Paper integration queue</h3>
+<hr />
+<h2>6. W6: Task-level cost parity — JMP cross-section (RESEARCH_DIRECTIONS Project 1)</h2>
+<p><strong>Question:</strong> Does the human-vs-AI cost-parity gap predict task-level AI usage intensity, within
+occupations? First pass = the cross-section; the AEI-vintage panel comes later.</p>
+<h3>Pre-registered specification — LOCKED 2026-06-10, before any estimation</h3>
+<ul>
+<li><strong>Sample:</strong> AEI snapshot (week 2025-11-13), global <code>onet_task</code> facet (~3,170 tasks), merged to
+  O<em>NET Task Statements → SOC occupations → OES national wages (May 2024 vintage, public download)
+  and OES employment. Tasks that fail the O</em>NET merge are reported, not silently dropped.</li>
+<li><strong>Human cost per task</strong> = OES mean hourly wage × AEI <code>human_only_time</code>/60 (measured minutes).</li>
+<li><strong>AI cost per task</strong> = (output-token proxy ∝ <code>human_with_ai_time</code>) × current frontier $/1M tokens
+  (Epoch/repo inference pricing). Acknowledged: nearly degenerate cross-sectionally — the parity gap is
+  dominated by the human-cost side; stated, not hidden.</li>
+<li><strong>LHS:</strong> log(usage share / economic-footprint share), footprint = O*NET task importance ×
+  (occupation OES employment share). Without footprint normalization the regression mechanically
+  recovers the wage-bill distribution — normalization is primary, unnormalized reported as diagnostic.</li>
+<li><strong>Primary spec:</strong> log relative usage = β·log(parity gap) + occupation FE + controls
+  (<code>task_success</code>, AEI education-years facets), SEs clustered by occupation (SOC 6-digit).</li>
+<li><strong>PLACEBO (decisive):</strong> the 2011–2019 occupation×year panel (<code>gpt_autoScores.csv</code>): regress
+  pre-AI software/AI exposure usage proxies on the same wage-based parity measure — the gradient must
+  be absent (or at least an order of magnitude smaller) pre-2022.</li>
+<li><strong>Known threats stated up front:</strong> Claude-user selection (occupation FE + footprint normalization +
+  BTOS industry cross-check); single-week snapshot (level estimates carry that caveat until vintages
+  are pooled); time facets are AEI model-estimated.</li>
+</ul>
+<h3>Decision log</h3>
+<h3>Results log</h3>
+<h3>Surprises / anomalies</h3>
+<h3>Paper integration queue</h3>
+<hr />
+<h2>7. W7: Acemoglu upgrade — bottom-up TFP potential (RESEARCH_DIRECTIONS Project 4)</h2>
+<p><strong>Question:</strong> AI's aggregate TFP potential with both inputs MEASURED: AEI usage shares × AEI time
+savings, aggregated through OES employment — replacing Acemoglu (2024)'s exposure × lab-study inputs.</p>
+<h3>Pre-registered specification — LOCKED 2026-06-10</h3>
+<ul>
+<li><strong>Task-level savings</strong> = (<code>human_only_time</code> − <code>human_with_ai_time</code>) / <code>human_only_time</code>, floored at 0.</li>
+<li><strong>Aggregation (first pass, no IO):</strong> GDP-equivalent labor-cost savings =
+  Σ_tasks [savings × task wage-bill share × current usage incidence], wage-bill share from OES
+  employment × wage × task importance weights within occupation. TFP potential = labor-cost savings ×
+  labor share (0.6). Reported BOTH at observed usage incidence ("realized potential now") and at
+  full-eligible-usage ("ceiling"), bracketed against Acemoglu's 0.66%.</li>
+<li><strong>Caveats stated:</strong> adopter-ATT not ATE (savings conditional on Claude use); single week; AEI time
+  facets are model-estimated. W1 link: map the implied increment shift onto electrification-sized vs
+  IT-sized historical increments.</li>
+</ul>
+<h3>Results log</h3>
+<h3>Surprises / anomalies</h3>
+<hr />
+<h2>8. W8: Firewood→coal — background data acquisition (RESEARCH_DIRECTIONS Project 3)</h2>
+<h3>Acquisition log</h3>
+<ul>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> Fetched 6 NBER-macrohistory coal price series via FRED (keyless fredgraph CSVs)
+  into <code>data/energy_costs/us_coal/</code>: anthracite (M04045US35620, M04G4AUS35620, M04G4BUS) and bituminous
+  (M04046US35620, M0490AUS, M0490BUS) — Philadelphia/US, monthly. <strong>All start 1890+ — usable for
+  late-period parity validation but NOT for the 1820–1870 industrialization window the project needs.</strong>
+  Early-period US coal prices (Philadelphia anthracite from the 1820s; Cole 1938 wholesale price tables;
+  Historical Statistics of the US series) remain archival — next step is ICPSR/HathiTrust digitized
+  tables or manual entry from Cole. UK side is already covered (BOE millennium + Clark in repo).</p>
+</li>
+<li>
+<p>2026-06-10 <code>[DECISION]</code> <strong>Spec amendment (before any observed-k computation, logged per protocol):</strong>
+  the locked spec cited standalone Paper B's coefficients (α=−3.627, β=−0.953, N=22). The pipeline
+  reproduces the UNIFIED paper's 30-observation regression (α=−3.928, β=−1.081, R²=0.463) — the
+  program's actual headline model, which includes the 1605–1825 technologies. The frozen model is the
+  unified-paper version; the assertion now pins −3.928/−1.081. The amendment was triggered by the
+  reproduction assertion itself (it refused to run with mismatched coefficients), not by any sight of
+  observed adoption data.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[SURPRISE]</code> <strong>BTOS re-worded its AI question in Nov 2025</strong> (old: AI "in production of
+  goods or services", 3.7% Sept 2023 → ~10% Sept 2025; new: "in any business function", 17.3% Nov 2025
+  → 20.6% Jun 2026). The current National.xlsx carries only the NEW question (14 waves). The level jump
+  between regimes is a definition change, not adoption. Handling: fit the two question regimes
+  SEPARATELY — old-question series from cited published points (<code>data/adoption/btos_ai_manual_points.csv</code>,
+  sources: CES-WP-24-16; Fed FEDS note 2026-04-03; Goldschlag) and the in-repo new-question waves —
+  and report both. No splicing.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W5 complete (notebooks/19_ai_31st_observation.py). THE COST-BARRIER LAW
+  SURVIVES ITS FIRST OUT-OF-SAMPLE TEST.</strong></p>
+</li>
+<li>Frozen model reproduced exactly (α=−3.928, β=−1.081, R²=0.463, n=30; assertion-pinned). Extending
+    the cost panel to 2024 leaves all 30 historical barriers unchanged to 8 decimals (frozen p_max OK).</li>
+<li><strong>AI barrier = 0.0223 — BELOW the entire historical support</strong> (minimum: mobile phones 0.030). Its
+    cognitive component is literally 0.000 (the cognitive cost index at 2022 is ~0 of its historical
+    max); the barrier is almost all the irreducible "bits" distribution floor (0.020) plus a sliver of
+    energy (0.002). Finding in itself: by the framework's accounting, AI faces effectively no input-cost
+    barrier. Prediction is therefore an extrapolation outside support — band wide accordingly.</li>
+<li>Predicted k̂ = 1.20, 90% predictive interval [0.21, 7.05].</li>
+<li>Observed k: BTOS old-question regime (3.7%→10%, 2023.7–2025.7, cited points) → 0.48–0.70 across
+    ceilings; new-question regime (17.3%→20.6%, 14 in-repo waves) → 0.40–0.52 (free/50%/100% ceilings;
+    the 20%-ceiling fit is degenerate at 4.09 — ceiling forced just above current level, flagged not
+    hidden); manual-signals 2-point 1.78; ADVI 0.155.</li>
+<li><strong>8/9 estimates inside the band; only ADVI (0.155) falls below.</strong> Central observed mass ~0.4–0.7:
+    below the central prediction (1.2) but comfortably within uncertainty — and AT OR ABOVE the PC's
+    k=0.37, which revises the earlier W4 surprise: the "AI slower than the PC" reading came from the
+    ADVI composite, which now looks like an underestimate relative to direct BTOS fits.</li>
+<li>
+<p>2026-06-10 <code>[SURPRISE]</code> The test is weak by construction (R²=0.46 + extrapolation below support →
+  a 34-fold-wide band). The informative content is less "AI is inside the band" than (a) the barrier
+  accounting (no input barrier left, only the bits floor) and (b) the observed-k range itself.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W6 cross-section complete (notebooks/20_task_parity.py; src/task_parity.py; 7 tests).</strong> Sample: 2,707 task-occupation rows (2,063 tasks, 457 occupations); AEI→O<em>NET merge rate 86.3% (535 unmatched tasks reported). Median measured time savings 91% (consistent with Anthropic's published "80% average"); median human/AI cost-parity ratio ~636x. - </em><em>No controls: parity-gap elasticity +0.216 [+0.09, +0.34]</em><em> — tasks with larger human-cost advantage get used more, the predicted direction. - </em><em>PRIMARY (with task-success control): −0.030 [−0.16, +0.10], ns.</em>* The capability control absorbs the entire gradient: cost advantage and AI capability are collinear across tasks. The cross-section CANNOT separate the cost channel from the capability channel — exactly the threat the memo flagged; identification must come from the AEI-vintage panel leg (price-cut event studies). The JMP design survives; the cross-section alone does not carry it. - Placebo caveat discovered: <code>pct_ai</code> in the 2011–2019 panel is a STATIC exposure score (identical coefficient every year, 0.236), not a yearly vacancy series — so the "pre-AI gradient" comparison is one cross-section (0.236) vs the AEI-era usage-wage gradient (1.487): the wage gradient of AI activity is ~6x steeper now than the exposure-score gradient pre-2022. Coarse, labeled as such. - Data decisions logged: AEI time-facet UNITS verified (human_only_time in HOURS, human_with_ai_time in MINUTES — validated against the published "80% average savings"); task_success facet carries ::yes/::no suffixes (success = yes/(yes+no)); OES wages are the in-repo 2019 vintage (BLS blocks scripted May-2024 downloads; relative wages persistent).</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W7 complete (notebooks/21_acemoglu_upgrade.py).</strong> Replacing Acemoglu (2024)'s
+  imputed inputs with measured ones: measured mean per-instance savings 90% (vs 27% imputed lab input);
+  measured eligible coverage 74% of the 2019 wage bill (unmerged = zero savings, conservative).
+  <strong>CEILING TFP 39.4%</strong> (all eligible work AI-assisted) — ~49x the electrification-era increment shift
+  when spread over 10 years, i.e., beyond any historical transition; <strong>REALIZED-now TFP 3.6%</strong> at the
+  current incidence anchor (BTOS 20.6% firm × 45% worker adoption) — ~5x Acemoglu's 0.66%.</p>
+</li>
+<li>2026-06-10 <code>[SURPRISE]</code> The ceiling's absurd size is the finding: per-INSTANCE measured savings (on
+  tasks users chose to bring to Claude) cannot be applied to task work as an ATE — selection into usage
+  is the dominant wedge between the AEI-measured world and Acemoglu's calculation. The honest headline
+  is the bracket [0.66%, 39%] and the diagnosis, not either endpoint. The realized-now number (3.6%) is
+  the defensible upgrade.</li>
+</ul>
+<h3>W6 panel leg — pre-registered specification — LOCKED 2026-06-10, before estimation</h3>
+<ul>
+<li><strong>Vintages (5):</strong> v1 (Claude.ai Dec 2024–Jan 2025; <code>task_pct_v1.csv</code>, HF release_2025_03_27; dated
+  2025.00), v2 (Feb–Mar 2025; <code>task_pct_v2.csv</code>; 2025.17), Aug 2025 week (raw v3 format, HF
+  release_2025_09_15; 2025.60), Nov 2025 week (in-repo raw; 2025.88), Feb 2026 week (HF
+  release_2026_03_24; 2026.10). All Claude.ai (consumer) platform for comparability.</li>
+<li><strong>Harmonization:</strong> normalized task-text layer (<code>_norm_text</code>, the stable layer across taxonomy
+  versions); usage shares renormalized within vintage over the BALANCED intersection of tasks present in
+  all five vintages (primary); unbalanced pairs as robustness. Match rates per vintage reported.</li>
+<li><strong>Cost paths (the identification engine):</strong> tasks assigned time-invariant price tiers by terciles of
+  Nov-2025 <code>human_only_time</code> (task size/complexity proxy: long tasks → frontier, mid → mid, short →
+  commodity); tier price levels at each vintage = latest output-token price at-or-before the vintage
+  date from <code>load_inference_pricing</code> (frontier flat ~$15; commodity collapsing 0.28→0.10). Cross-task
+  variation in Δlog p comes from differential tier paths — a common price change is absorbed by
+  vintage effects and contributes nothing, stated up front.</li>
+<li><strong>Primary spec (first differences):</strong> Δlog(share)<em>{j,t} = α_t + β·Δlog(p_tier(j),t) + ε</em>{j,t},
+  SEs clustered by task. Task fixed levels (including time-invariant CAPABILITY) difference out —
+  this is the cross-sectional collinearity fix. Expected β &lt; 0.</li>
+<li><strong>Confound stated:</strong> capability CHANGES between vintages are absorbed only insofar as they are common
+  (α_t); tier-correlated capability drift (frontier models improving faster on long tasks) remains and
+  is partially addressed by the Δ task_success control on the v3-vintage subset (Aug→Nov→Feb).</li>
+<li>
+<p><strong>Falsification:</strong> tier-assignment permutation placebo (200 draws; β must die); leave-one-vintage-out.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W6 panel leg complete (notebooks/22_task_parity_panel.py).</strong> Five AEI vintages
+  harmonized at the task-text layer (3,514/3,365/2,618/3,170/3,260 tasks; balanced panel 1,869 tasks ×
+  5 vintages = 7,476 FD pairs; 100% tier coverage). Tier price paths: commodity $1.25→$0.10 (−92%),
+  frontier flat at $15.</p>
+</li>
+<li><strong>PRIMARY FD price elasticity: −0.009 (se 0.010), CI [−0.030, +0.012], cluster p=0.39, permutation
+    p=0.43.</strong> Essentially zero. Leave-one-vintage-out: dropping v1 or v2 gives −0.034 to −0.038
+    (se 0.013–0.019, |t|≈2–2.6) — the early-vintage mid-tier price jump (see surprise below) attenuates
+    the pooled estimate.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> Measurement weakness found: the repo pricing table is sparse (15 rows), so the "latest price at-or-before vintage per tier" path produces a composition artifact — the mid tier jumps 0.28→4.00 between v1 and v2 because the representative model switches (deepseek-v3 → claude-3.5-haiku), not because prices rose. A credible version needs per-model price histories weighted by actual model mix (Artificial Analysis history, or the AEI 1P API files which may carry model identifiers)..</li>
+<li>2026-06-10 <code>[SURPRISE]</code> <strong>The economically coherent bottom line across both W6 legs:</strong> in the
+  cross-section, the parity-gap gradient is absorbed by capability; in the panel, with capability
+  differenced out, a 92% commodity-tier price collapse moves task usage composition by essentially
+  nothing (β ≈ −0.01 to −0.04). Interpretation: at parity gaps already ~600x, price is far past the
+  adoption margin — <strong>task-level AI usage composition is capability-constrained, not price-constrained.</strong>
+  This is consistent with, and sharpens, W5's barrier accounting (AI's input-cost barrier ≈ 0; only the
+  bits floor remains). The JMP's story is "the cost-barrier law at the task level: cost ceases to bind
+  once parity is crossed — capability becomes the diffusion bottleneck," which the historical 30-tech
+  regression cannot see because its technologies were all near their cost margins at launch.</li>
+</ul>
+<h3>W7 extension — pre-registered specification — LOCKED 2026-06-10, before estimation</h3>
+<ol>
+<li><strong>Quality adjustment:</strong> primary effective savings = savings × task_success_rate (failed instances
+   yield zero savings); conservative variant = success×savings − (1−success)×(with_ai/only) (failures
+   also waste the AI interaction time). Recompute CEILING and REALIZED-now under both.</li>
+<li><strong>Vintage stability:</strong> recompute measured savings and headline numbers on the Feb-2026 vintage
+   (the only other release with time/success facets — Aug-2025 predates them); report drift vs Nov-2025.</li>
+<li><strong>Selection bounds (partial identification):</strong> the aggregate is bounded by replacing the per-instance
+   90% with external ATE estimates from the RCT literature (cited manual file
+   <code>data/adoption/rct_ate_savings.csv</code>: Brynjolfsson-Li-Raymond 14%, Acemoglu's input 27%, Noy-Zhang 37%,
+   Peng et al. 56%).
+   Report TFP(savings) over the grid; the honest interval is [TFP(ATE_low), TFP(per-instance)].</li>
+<li><strong>Domar sensitivity:</strong> aggregation through intermediates multiplies value-added TFP by the Domar-
+   weight sum (~1.9, Hulten); labeled crude, no full BEA IO this pass.</li>
+<li>
+<p><strong>"Showing up yet?" check:</strong> Fernald <code>dtfp_util</code> mean 2023Q1–2026Q1 vs the 2010–2019 baseline,
+   compared against the realized-now implied +0.36pp/yr. Descriptive only (3 years, COVID-adjacent).</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W7 extension complete (notebooks/23_acemoglu_extensions.py).</strong> Quality:
+  success-weighting (75.6% success rate) cuts ceiling 39.3%→29.7%, realized-now →2.76% (conservative
+  28.7%/2.66%). Stability: 1,876 common Nov↔Feb tasks, savings corr 0.82, drift −0.2% — single-week
+  caveat largely retired. Selection bounds: realized-now ∈ [0.58%, 3.65%]; <strong>the conservative-ATE
+  corner recovers Acemoglu's 0.66%</strong>. Domar ×1.9: [1.1%, 6.9%]. Fernald check: 2023–26Q1 TFP growth
+  +0.39pp/yr above 2010–19 baseline — at/above the implied interval (descriptive; COVID-adjacent).</p>
+</li>
+<li>2026-06-10 <code>[SURPRISE]</code> Feb-2026 AEI schema drift: time-facet cluster names gained a <code>::value</code>
+  suffix; extractor made vintage-proof (suffix stripped; tests still pass).</li>
+</ol>
+<h3>W7b — non-market wedge + verification tax — pre-registered spec — LOCKED 2026-06-10</h3>
+<p><strong>Goal:</strong> decompose the path from measured per-instance savings (90%) to realized TFP as a waterfall
+of MEASURED wedges — the figure a referee would ask for.</p>
+<ul>
+<li><strong>Stage 1 — per-instance savings</strong> (measured, W7): task-level (1 − with_ai/only), clipped at 0.</li>
+<li><strong>Stage 2 — quality wedge:</strong> × task success rate = yes/(yes+no) (measured, W7 extension).</li>
+<li><strong>Stage 3 — non-market wedge:</strong> × work share per task from <code>onet_task::use_case</code> counts —
+  work/(work+personal+coursework), not_classified excluded from the denominator. Personal and
+  coursework usage produces surplus that never enters TFP.</li>
+<li><strong>Stage 4 — verification tax (reported as a BAND, not a point):</strong> per-task automation share =
+  (directive + feedback loop)/(classified modes), Anthropic's own automation/augmentation split.
+  Upper bound: savings credited to all usage (with_ai_time already includes in-loop human time).
+  Lower bound: savings credited only to automation-mode usage (augmentation-mode savings = 0). The
+  truth is between; δ is not identified by these data and is stated as such.</li>
+<li><strong>Stage 5 — aggregation:</strong> wage-bill weights and 74.1% coverage as in W7; × incidence anchor 9.3%;
+  × labor share 0.6.</li>
+<li><strong>Vintage check:</strong> aggregate work share and automation share recomputed on Feb-2026 (both facets
+  exist there); drift reported.</li>
+<li>
+<p><strong>Output:</strong> waterfall figure (stages as bars, verification stage as a band), stage table, and the
+  final realized-now TFP band replacing W7's point estimate.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W7b complete (notebooks/24_savings_to_tfp_waterfall.py). The measured
+  waterfall:</strong> 90% per-instance savings → ×75.6% success (quality) → ×46.3% work share (non-market) →
+  ×[47.2% automation share, 1] (verification band) → 9.3% incidence → 0.6 labor share.
+  Ceiling band [6.2%, 15.4%]; <strong>realized-now TFP band [0.58%, 1.43%] — Acemoglu's 0.66% sits INSIDE
+  it.</strong> The fully-measured calculation converges on the famous number.</p>
+</li>
+<li>2026-06-10 <code>[SURPRISE]</code> <strong>The non-market wedge is the biggest single wedge after adoption: only 46.3%
+  of task-level AI usage is work</strong> (34.7% personal, 19.0% coursework) — more than half of measured AI
+  task activity can never appear in TFP. First-order for the whole AI-in-TFP debate and for W1's
+  "invisible transition" discussion (measurement, not just scope).</li>
+<li>2026-06-10 <code>[RESULT]</code> Wedge vintage stability (Nov→Feb): work share 46.3%→45.4%, automation share
+  47.2%→45.9% — stable; the verification tax is NOT yet shrinking.</li>
+</ul>
+<h3>W7c — verification-tax trajectory + reinstatement measurement — LOCKED 2026-06-10</h3>
+<ul>
+<li><strong>Automation share by vintage (5 points):</strong> v1 &amp; v2 from <code>automation_vs_augmentation_v{1,2}.csv</code>
+  (aggregate interaction-type shares: automation = directive + feedback_loop; augmentation =
+  task_iteration + validation + learning; 'filtered'/'none' excluded from denominator);
+  Aug-2025/Nov-2025/Feb-2026 from the <code>onet_task::collaboration</code> facet (same definitions,
+  counts-weighted). Question: is the verification tax falling?</li>
+<li><strong>Reinstatement candidate (corrected object):</strong> AEI's own taxonomy non-coverage — the
+  'none'/'not_classified' share within onet_task facet usage (Nov-2025: 6.49%) — NOT the W6 text-
+  unmatch rate. Pre-registered correction: the 13.7% W6 text-unmatch likely reflects O*NET VERSION
+  drift (repo db_30_1 vs Anthropic's), to be diagnosed by fuzzy-matching a sample of unmatched tasks
+  (similarity &gt; 0.9 ⇒ version drift, not new tasks). Track non-coverage across the v3 vintages.</li>
+<li>
+<p><strong>Output:</strong> trajectory figure (automation share; taxonomy non-coverage), per-vintage table,
+  fuzzy-match diagnosis of the W6 unmatched set.</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W7c complete (notebooks/25_verification_reinstatement.py).</strong></p>
+</li>
+<li><strong>Automation share (5 vintages, 14 months):</strong> 42.6% → 43.1% → 51.6% → 47.2% → 45.9%. Net +3.3pp,
+    but NON-monotonic, and the v1/v2 points come from a different measurement (aggregate interaction-
+    type files, earlier classifier) than the v3 collaboration facet. Within the method-consistent v3
+    segment (Aug'25→Feb'26) the share FELL 51.6%→45.9%. <strong>Honest verdict: the verification tax is not
+    measurably falling.</strong> The rate-limiter on converting savings to output is static or tightening.</li>
+<li><strong>Taxonomy non-coverage (reinstatement candidate):</strong> 8.1% → 6.5% → 7.0% of usage — stable ~7%,
+    not exploding. New-task creation visible but modest at this horizon.</li>
+<li><strong>Version-drift diagnosis confirmed the pre-registered correction:</strong> median best-match similarity
+    of W6-unmatched tasks vs O*NET 30.1 is 0.96; 55% exceed 0.9. The "13.7% unmatched = new tasks"
+    reading is dead; the honest reinstatement series is AEI's own ~7% non-coverage.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> Within the method-consistent vintages, automation share is FALLING while models improved substantially (Sonnet 4.5 era) — consistent with usage expanding INTO harder, more collaborative tasks as capability rises (composition effect), not with scaffolding absorbing oversight. Decompose within-task vs composition in a follow-up.</li>
+</ul>
+<h3>W7d — the scaffolding dividend: API vs consumer split — LOCKED 2026-06-10, before estimation</h3>
+<p><strong>Question:</strong> Is the flat consumer verification tax a composition artifact? 1P API traffic is
+scaffolded/agentic production use; the within-task API-consumer automation gap measures what
+scaffolding does, and a shift-share decomposition separates within-task movement from task-mix shifts.</p>
+<ul>
+<li><strong>Data:</strong> AEI 1P API raws for Aug-2025/Nov-2025/Feb-2026 (same releases as the consumer files;
+  schema verified before use). Consumer counterparts already on disk.</li>
+<li><strong>Definitions identical to W7c:</strong> automation = directive + feedback loop; augmentation = task
+  iteration + validation + learning; from the <code>onet_task::collaboration</code> counts (or the platform's
+  equivalent facet — to be verified); task layer = normalized text.</li>
+<li><strong>Primary objects:</strong>
+  (a) <strong>Scaffolding dividend</strong> = usage-weighted mean within-task (API − consumer) automation share,
+      Nov-2025; distribution reported, not just the mean.
+  (b) <strong>Trajectories</strong> of aggregate automation share by platform, Aug→Nov→Feb.
+  (c) <strong>Shift-share decomposition</strong> (the key test): ΔS = Σ w̄_j Δa_j (within-task) + Σ ā_j Δw_j
+      (composition), midpoint weights, tasks present in both endpoints (coverage reported), separately
+      per platform, Aug-2025→Feb-2026. Verdict rule: if consumer within-task component is positive
+      while composition is negative, the flat consumer series is a composition artifact; if within-task
+      is also flat/negative, the verification tax is genuinely static.</li>
+<li>
+<p><strong>Secondary:</strong> top task-mix differences API vs consumer (descriptive).</p>
+</li>
+<li>
+<p>2026-06-10 <code>[RESULT]</code> <strong>W7d complete (notebooks/26_scaffolding_dividend.py). The scaffolding dividend
+  is enormous and the composition hypothesis is rejected.</strong></p>
+</li>
+<li><strong>Dividend:</strong> usage-weighted within-task (API − consumer) automation gap = <strong>+30.1pp</strong> (median
+    +45.5pp; 89% of 1,322 common tasks more automated on API). Aggregate: API 81–87% vs consumer
+    46–52%. Same tasks, same model families — deployment context alone moves delegation by 30–45pp.
+    First measurement of this split to our knowledge.</li>
+<li><strong>Shift-share (Aug'25→Feb'26):</strong> consumer ΔS = −5.7pp = within −3.8pp + composition −1.9pp;
+    API ΔS = −6.1pp = within −5.5pp + composition −0.6pp. <strong>The falling automation share is a genuine
+    WITHIN-TASK phenomenon on both platforms — not task-mix.</strong> The W7c composition conjecture is dead.</li>
+<li>Task mix sanity: API tilts to software-maintenance tasks; consumer to tutoring/coursework.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> Within-task automation declining on BOTH platforms while models improved is the puzzle now. Candidate stories the aggregates cannot separate: (a) USER composition (marginal adopters collaborate more — user-base expansion, not task change); (b) within-task-category complexity creep; (c) product-surface changes promoting interactive workflows..</li>
+<li>2026-06-10 <code>[RESULT]</code> Waterfall implication: the API automation level (~81%) is the measured headroom
+  of scaffolded deployment. Moving work usage from consumer-style to API-style automation alone lifts
+  the waterfall's verification lower bound from 0.58% to ~1.0% realized-now TFP — without any model
+  improvement. The scaffolding dividend IS the near-term TFP frontier.</li>
+</ul>
+<h3>W7e — automation-decline decomposition + verifiability gradient — LOCKED 2026-06-10</h3>
+<p><strong>Part A — why is within-task automation falling? (Nov'25→Feb'26, both platforms)</strong>
+- Task-level changes regression, usage-weighted, HC1: Δauto_share_j on (i) Δlog human_only_time_j
+  (instance-complexity creep), (ii) Δ task-mean human_education_years_j (user-skill composition),
+  (iii) Δlog usage_j (expansion proxy). Aggregate user-skill distribution shift reported alongside.
+- Predictions: USER-COMPOSITION story → aggregate user education falls AND Δauto loads positively on
+  Δuser-education (where skill fell, automation fell); COMPLEXITY-CREEP story → Δauto loads negatively
+  on Δlog human_only_time. API contrast is diagnostic (no consumer-style user base).
+<strong>Part B — verifiability gradient</strong>
+- Pre-registered keyword rubric on task text (transparent, crude, stated):
+  VERIFIABLE if contains: program/software/code/debug/database/query/calculat/comput/spreadsheet/
+  data entry/test plans; UNVERIFIABLE if contains: advis/counsel/teach/instruct/mentor/negotiat/
+  persuad/coordinate/supervis/confer with; remainder = middle. Rubric frozen before estimation.
+- Tests: (i) automation-share LEVELS by class × platform (Nov); (ii) TRENDS Aug→Feb by class;
+  (iii) the scaffolding dividend by class — verification tech (δ→1) should appear first where outputs
+  are machine-checkable. (iv) wage-bill share by class (W6 weights) → the Baumol-within-cognitive-work
+  statement.</p>
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W7e complete (notebooks/27_decline_decomposition.py).</strong>
+  <strong>Part A (why is within-task automation falling, Nov→Feb):</strong> NOT a user-composition story. Consumer:
+  aggregate user education fell (12.31→11.99 yrs) but within-task Δuser-edu does NOT move automation
+  (+0.004, p=.59); instance-complexity creep DOES (Δlog human_time −0.047, p=.035); growing tasks
+  became MORE automated (Δlog usage +0.061, p&lt;.001). API: signs flip — complexity creep loads POSITIVE
+  (+0.056, p=.03: scaffolding converts bigger jobs into delegation), user-edu rose, the decline is
+  mostly an unexplained common component (const −0.026), plausibly product/model-mix drift or new
+  agentic use-cases onboarding in collaborative mode.
+  <strong>Part B (verifiability gradient):</strong> consumer LEVELS show a clean predicted gradient — automation
+  58.3% (verifiable) &gt; 42.7% (middle) &gt; 32.4% (unverifiable), a 26pp spread. But the API gradient is
+  COMPRESSED (83.8/87.1/76.7) and the scaffolding dividend is LARGER for unverifiable tasks (+44.3pp)
+  than verifiable (+25.6pp) — contradicting the pre-registered δ→1-where-checkable prediction.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> <strong>Deployment context substitutes for machine-verifiability.</strong> Verifiability
+  governs where INTERACTIVE users delegate; scaffolded production contexts delegate broadly, with the
+  largest dividend exactly where consumer delegation is lowest (ceiling effect + downstream/process
+  verification replacing in-loop human checking). The verification-tax theory survives in levels but
+  its sharpest dynamic prediction fails — the refined claim: the tax binds at the consumer margin and
+  is bought out wholesale, not task-by-task, by deployment infrastructure.</li>
+<li>2026-06-10 <code>[RESULT]</code> Baumol-within-cognitive-work, quantified: machine-verifiable tasks are only
+  14.7% of the W6 wage bill (unverifiable 11.5%, middle 73.8%) — even full automation of the
+  verifiable slice moves the aggregate modestly; the middle mass is where the TFP action is.</li>
+</ul>
+<hr />
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> W8 fetchable-only campaign run per the pre-committed addendum (end of file).
+  NBER macrohistory ch.04 re-probed exhaustively: every coal price series starts 1890+ (earliest
+  ch.04 commodity of any kind: 1842, and it's pig iron). GPIH sweep found ONE fetchable US coal
+  price series: San Francisco wholesale, $/short-ton, 1849-1900 annual (Berry 1984) — landed in
+  data/energy_costs/us_coal_early/ with PROVENANCE.md; loader load_us_early_coal_prices() appended
+  to src/cost_data.py (long-ton conversion inside the loader; 5 tests).</li>
+<li>2026-06-10 <code>[RESULT]</code> <strong>KILL CRITERION TRIGGERED:</strong> fetchable sources = 1 city x 22 obs in
+  1820-1870 (SF 1849-1870) vs required &gt;=2 cities x &gt;=25. The window is publicly unacquirable;
+  fallback design (Philadelphia-only via Bezanson ILL + UK validation + 1890+ NBER anchor) is now
+  operative.</li>
+</ul>
+<h2>9. Paper C ("The Measured Anatomy of AI's Economic Impact") — drafting log</h2>
+<h3>Phase A verification results (2026-06-10) — all primary-source checked</h3>
+<ul>
+<li><strong>V1 RCT ATEs (corrected in <code>data/adoption/rct_ate_savings.csv</code>):</strong> Noy-Zhang = <strong>40%</strong> time
+  decrease (0.8 SD; our file had 37% — corrected), Science 381:187-192. BLR = <strong>15%</strong> issues/hour in
+  the published QJE 2025 version (14% in the 2023 WP; 34% novices) — using 15%, noting the WP value.
+  Peng et al. = 55.8% ✓. <strong>Internal consistency check passed: Acemoglu's 27% is exactly
+  avg(NZ 40, BLR 14)</strong> — his own text confirms ("the average of the estimates in Noy and Zhang (2023)
+  and Brynjolfsson et al. (2023)").</li>
+<li><strong>V15 Dell'Acqua decision: EXCLUDED from the bounds grid</strong> (its ~25% sits inside the existing
+  spread; the inside/outside-frontier design muddles the time metric); cited in text for the quality
+  margin instead.</li>
+<li><strong>V2+V7 Acemoglu (2024) object verified from the paper itself:</strong> TFP bound = 19.9% exposure
+  (Eloundou scores, wage-bill-aggregated by Acemoglu) × 23% profitably-performable within 10 yrs
+  (Svanberg et al., computer vision) × 15.4% total cost savings (27% labor savings × industry labor
+  shares) ⇒ <strong>0.71% cumulative 10-yr TFP in the WP body (~0.07%/yr); 0.66% is the abstract/NBER
+  number; 0.55% with the hard-tasks adjustment; GDP 1.1% (1.6–1.8% with AR2022 investment)</strong>. Object
+  class = Hulten-style cumulative level gain at a given adoption extent — SAME class as our
+  realized-now band (his extent: 19.9%×23%=4.6% of tasks; ours: measured current incidence). The money
+  sentence is defensible with this wording; cite 0.66 (published headline) and footnote 0.71/0.55.</li>
+<li><strong>V3 AEI units RESOLVED by triangulation</strong> (official data_documentation.md is silent on units):
+  the Jan-2026 report states speedup factors of <strong>9x–12x</strong> by education level ⇒ 89–92% savings,
+  matching our measured 90–91% almost exactly; value ranges (human-only median 2.6 → hours;
+  with-AI median 14.4 → minutes ≈ conversation lengths). Document the inference in the appendix.</li>
+<li><strong>V13 NEGATIVE finding:</strong> the "&lt;7 min median absolute error" validation claim is NOT in the primary
+  Anthropic report (it came from secondary summaries) — will NOT be cited. Instead the validation
+  subsection uses: the report's own speedup factors vs our savings; Anthropic's own automation/
+  augmentation split (45/52 Claude.ai) vs ours (47.2%, definitions differ slightly); cross-vintage
+  0.82; RCT-domain comparison. Quotable selection acknowledgment from Anthropic: "users bring tasks
+  to Claude that they're more confident will work."</li>
+<li><strong>V6 incidence anchor RESOLVED:</strong> Bick-Blandin-Deming (NBER w32966 + RPS updates): <strong>1–5% of all
+  work hours AI-assisted; reported time savings ≈ 1.4% of total work hours</strong>; 27% of employed used
+  gen-AI for work in prior week. The paper presents TFP as a FUNCTION of incidence with BBD (1–5%)
+  and the BTOS-derived 9.3% as marked candidates. <strong>Bonus convergence: BBD's 1.4% direct
+  time-savings × 0.6 labor share ≈ 0.84% TFP-equivalent — inside our band.</strong></li>
+<li><strong>Humlum-Vestergaard (2025 NBER w33777):</strong> 3% average time savings among work users; no detectable
+  earnings/hours effects (CIs exclude &gt;1%); 3–7% pass-through. Reconciliation for the paper: our 90%
+  per-instance × BBD 1–5% assisted-hours ⇒ 0.9–4.5% of user work hours, bracketing HV's 3%. Three
+  independent methodologies cohere once the incidence margin is explicit.</li>
+<li><strong>Chatterji et al. (NBER w34255):</strong> ChatGPT consumer non-work share grew 53%→&gt;70% (work share
+  47%→&lt;30%) — external corroboration of the non-market wedge (our Claude task-usage work share:
+  46.3%, professional skew expected).</li>
+</ul>
+<h3>Phase A internal review (V4) results — 2026-06-10</h3>
+<ul>
+<li><strong>One (a)-severity finding (A1), fix incorporated into the paper pipeline:</strong> the QUOTED aggregate
+  wedge shares (46.3% work, 47.2% automation) were computed from raw facet sums (duplicate-inflated,
+  different sample) — not the task-level objects that drive the TFP band. <strong>The TFP band itself is
+  SAFE</strong> (wage-bill weights normalize within SOC; reviewer reconstructed Σw/TOTAL_WB = 0.741
+  regardless). Paper-pipeline rule: every quoted aggregate share = usage-weighted mean over distinct
+  task_norm, asserted equal to the waterfall's weights.</li>
+<li>(b)-level fixes/caveats adopted: B1 drop within-SOC duplicate task rows before regression (6 rows;
+  src fix + new multi-SOC test); B2 the FD panel's PRIMARY inference is the tier-permutation p
+  (task-clustered SE anti-conservative under tier-level treatment — Moulton); B3 success-rate
+  selection caveat + robustness with not_classified in the denominator; B4 dedup the placebo usage
+  aggregate; B5 verifiability rubric order-flip robustness.</li>
+<li>Reviewer confirms: shift-share algebra exact; FE/FD estimators sound; units conversion correct;
+  no test masks a bug.</li>
+</ul>
+<h3>Phases B-E results (2026-06-10)</h3>
+<ul>
+<li><strong>Phase B:</strong> <code>papers/paper_c_measured_anatomy/paper_c_measured_anatomy.py</code> consolidates notebooks
+  20/22/24-27 by paper section; 52 scalars + 11 tables persisted; A1/B1 fixes applied (quoted work
+  share is now the wage-bill-weighted 50.3%, superseding the 46.3% artifact; band unchanged at
+  [0.58%, 1.43%]); MDE = 0.031 (the historical −1 is &gt;30x the detectable effect); incidence curve
+  with BBD 1-5% and BTOS 9.3% marks; validation table (AEI savings 86-90% uniform across RCT domains).</li>
+<li><strong>Phase C:</strong> paper.tex (~9,500 words + appendix) + references.bib (29 entries) drafted; clean build.</li>
+<li><strong>Phase D:</strong> referee review — no structural issues; surgical fixes applied ("thirty-five"→"more than
+  thirty" [the 0.031 MDE gives 32x], ω-asymmetry made explicit in footnote 3, causal-language softened
+  in cross-section and verifiability sections, capability marked as unmeasured residual, abstract
+  trimmed ~80 words). Numbers audit — ~150 claims vs CSV ground truth, 7 issues, all fixed (Table 2
+  N typo 2,209→2,211; rubric order-flip claim corrected to 1.6pp max; Section 6 counterfactual
+  1.3%→1.0% per notes; ATE range 15-56%; 0.9-4.5% intro arithmetic; ~2% both-list share). Final build:
+  zero errors, zero undefined references.</li>
+<li><strong>Phase E:</strong> <code>site/index.html</code> — self-contained whole-program site (archival-editorial design;
+  two-arc map, interactive waterfall, Registry of Nulls, papers/colophon); all 9 asset references
+  verified resolving; GitHub-Pages-ready (point Pages at /site or copy to /docs).</li>
+</ul>
+<h2>10. W9: The dynamic waterfall — projected realized-TFP path 2026–2040 (RESEARCH_DIRECTIONS §9.4)</h2>
+<h3>Pre-registered specification — LOCKED 2026-06-10, before any projection run</h3>
+<p><strong>Goal:</strong> replace W7b's static realized-now band [0.58%, 1.43%] with a projected path S(t),
+2026–2040, by parameterizing each wedge's trajectory from measured inputs, and feed the implied
+TFP-increment path to W4's break-timing question. Two headline scenarios adjudicated by incoming
+data: "wedges stay flat" (measured trends continue) vs "wedges unlock by 2029" (the fast-takeoff
+parameterization from the 2026-06-10 discussion).</p>
+<p><strong>Model (multiplicative index on the static anchor; no double counting):</strong></p>
+<p>S_b(t) = LABOR_SHARE × A(t) × INTENSITY × Σ_b(t)/TOTAL_WB × g_succ(t) × g_auto_b(t)</p>
+<p>with b ∈ {lo, hi} the W7b verification band:
+  Σ_hi(t) = Σ_{hot_i ≤ H(t)} w_i·sav_i·succ_i·work_i        (δ = 1 upper bound)
+  Σ_lo(t) = Σ_{hot_i ≤ H(t)} w_i·sav_i·succ_i·work_i·auto_i  (automation-only lower bound)
+using W7b's exact task-level inputs and wage-bill weights (notebook 24 code reused verbatim).</p>
+<p><strong>Anchor discipline:</strong> at t0 = 2026.37 (latest BTOS wave) with H(t) unbounded, A(t0)=0.206,
+INTENSITY=0.45, g=1, the model must reproduce W7b's static band [0.58%, 1.43%] exactly (assert).
+The coverage gate at t0 then states how much of that band is within today's reliability frontier.</p>
+<p><strong>Wedge trajectories (each measured or stated as parameterization):</strong>
+1. <strong>Incidence A(t)</strong> — logistic fit to the BTOS new-question series (now through wave 202611,
+   May 2026, 20.6%): central = free-ceiling fit (L≈1.0, k≈0.40), sensitivity L=0.5 (k≈0.52).
+   INTENSITY held at 0.45 (BBD within-adopter hours share) — conservative; frontier expansion
+   enters through the coverage gate, not intensity, to avoid double counting.
+2. <strong>Coverage gate H(t)</strong> — METR TH1.1 anchor: Claude Opus 4.5 P50 horizon = 320 min at 2025.88;
+   doubling time d ∈ {131 days (post-2023, central), 196 days (long-run, slow)}.
+   Primary gate = 80%-reliability horizon H80(t) = H50(t)/5 (ratio from METR's March-2025 paper;
+   stated as parameterization). Sensitivity: 50% gate. Gate saturates at the estimation sample
+   (74.1% wage-bill coverage) — no extrapolation beyond measured tasks (conservative).
+3. <strong>Quality wedge g_succ(t)</strong> — flat: 1. Move: aggregate success 0.756 → 0.95 via logistic,
+   midpoint 2029, rate 1.2/yr (the "continual-learning unlock" parameterization).
+4. <strong>Verification wedge g_auto(t)</strong> — applies to the LOWER bound only. Flat: 1 (automation share
+   stays at measured 46%, its 14-month trajectory). Move: aggregate automation share 0.461 → 0.85
+   (the MEASURED API/scaffolded level from W7d — the target is data, not assumption), logistic,
+   midpoint 2029, rate 1.2/yr.
+5. <strong>Non-market wedge</strong> — held fixed (preference-driven; measured stable Nov→Feb). Inside Σ.</p>
+<p><strong>Outputs:</strong> (a) S(t) paths 2026–2040, band per scenario, central diffusion/horizon variants as
+sensitivity table; (b) implied annual increment ΔS(t) in pp/yr; (c) break-timing metrics: year of
+peak increment, first year ΔS ≥ {0.25, 0.5, 1.0} pp/yr per scenario×band; (d) W4 Scenario-B
+refresh: speed-scaled lags recomputed with measured k_AI ∈ {0.40, 0.52} replacing the ADVI 0.155,
+alongside the dynamic-waterfall break years. Tables + two figures to
+notebooks/output/dynamic_waterfall/; notebook 28.</p>
+<p><strong>Stated limitations (in advance):</strong> capability path is a parameterization, not a forecast (the
+paper's "unmeasured residual" stays unmeasured — W9 transmits scenarios through measured wedges);
+selection unwind means per-instance savings should FALL toward RCT ATEs as incidence broadens
+(S(t) upper paths overstate; noted, not modeled); BTOS speed/ceiling confounding at 2.9 yrs of
+data; the 80%/50% horizon ratio and the 2029 midpoint are the two free parameters.</p>
+<ul>
+<li>2026-06-10 <code>[DECISION]</code> (post-lock, disclosed) <strong>Gate-admissibility filter added:</strong> variants where
+  the coverage gate implies within-adopter frontier utilization κ &gt; 1 are dropped (all 196-day
+  doubling × 80%-gate cells, κ 1.53–1.69). A gate that excludes effective mass which measured usage
+  demonstrably includes cannot be rationalized at INTENSITY=0.45; keeping those cells produced the
+  perverse ordering "slower capability growth ⇒ faster TFP" via κ inflation. Admissible coverage
+  variants: 80% gate at 131-day doubling (κ_lo=0.93, κ_hi=0.99) and the 50% gate (κ=0.45, coverage
+  channel already saturated). 24 of 32 grid cells survive.</li>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W9 complete (notebooks/28_dynamic_waterfall.py).</strong> All paths anchor at the
+  static band [0.58%, 1.43%] at t0=2026.38 (asserted vs W7b table exactly). Central variant
+  (free-ceiling diffusion k=0.40, 131d doubling, 80% gate): <strong>wedges flat</strong> → S(2035) = 5.3% (lo) /
+  13.9% (hi), peak increment 1.4 / 3.8 pp/yr in 2027; <strong>wedges unlock 2029</strong> → S(2035) = 12.6% / 17.1%,
+  verification-bound peak increment 2.2 pp/yr in <strong>2030</strong>. Conservative corner (flat, L=0.5, no
+  coverage channel, lo): S plateaus at 1.4%, peak increment 0.18 pp/yr — permanently invisible to W2.
+  The grid's peak-increment years cluster at exactly two dates: <strong>2027</strong> (coverage-saturation-driven,
+  80%-gate cells) and <strong>2030</strong> (wedge-unlock-driven). Implied κ: adopters already utilize ~93–99% of
+  the 80%-reliability frontier — the eligible-task margin is saturated TODAY; growth must come from
+  adoption (extensive) and verification (δ), not from more use of currently-reliable tasks.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> <strong>The coverage wedge dies almost immediately under measured METR doubling:</strong>
+  at 131-day doubling the 80%-reliability horizon crosses the entire AEI task sample (max
+  human-only time 837 min) by mid-2027. The 80%-gate model therefore front-loads a near-doubling of
+  realized TFP by 2028 (+1.4 pp/yr lower bound in 2027 even with wedges flat) — a falsifiable
+  near-term prediction the quarterly Fernald detector (W2) adjudicates within ~8 quarters. If 2027
+  shows no such acceleration, the coverage channel is rejected and the 50%-gate/no-coverage reading
+  stands: everything rides on adoption × verification, peak increments 2029–2030 only if wedges move.</li>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W4 Scenario-B refresh with measured diffusion speed</strong> (replacing ADVI
+  k=0.155 with BTOS-measured k ∈ [0.40, 0.52]): steam analogy → break 2027–2028; electrification →
+  2031–2034; IT → 2048–2055. The steam/electrification branch now lands in the late-2020s/early-2030s
+  — the unified paper's §9.2 conditional sentence ("mid-2030s, more plausibly 2050s") anchors on raw
+  lags and the ADVI k; measured adoption speed selects the compressed branch. Update queued for the
+  unified paper. Tables: output/dynamic_waterfall/{table_dynamic_paths, table_break_timing,
+  table_scenario_b_refresh}.csv; figures: fig_dynamic_waterfall, fig_break_sensitivity.</li>
+</ul>
+<h2>11. W10: Selection unwind + measured wedge-vintage check (W9 follow-ons)</h2>
+<h3>Pre-registered specification — LOCKED 2026-06-10, before any estimation</h3>
+<p><strong>Goal:</strong> (a) model W9's stated-but-unmodeled limitation — per-instance savings decline toward RCT
+ATEs as incidence broadens; (b) the first measured vintage table of the two unlockable wedges
+(success rate, automation share), wage-bill-weighted, testing "wedges flat vs moving" against the
+W9 unlock parameterization.</p>
+<p><strong>(a) Selection unwind — mixture/ATT-composition model:</strong>
+  s̄(t) = [A0·0.90 + (A(t)−A0)·s_RCT] / A(t);   g_sel(t) = s̄(t)/0.90
+applied as an aggregate scalar multiplier to S_b(t), BOTH bands (selection acts at the savings
+stage, upstream of the verification split). Properties: g_sel(t0)=1 exactly (anchor discipline
+preserved; κ calibration unchanged); s_RCT=0.90 nests W9 verbatim; monotone decreasing in A.
+Central anchor s_RCT = <strong>0.27</strong> (Acemoglu calibration = avg(Noy-Zhang 40, BLR 14); the repo's
+existing conservative selection bound in table_selection_bounds.csv); band {0.15, 0.56} (the RCT
+range, data/adoption/rct_ate_savings.csv). Mixture weight = BTOS A(t) (extensive adopter margin),
+NOT U(t). Grid = selection ∈ {none, unwind-27, unwind-15, unwind-56} × the 24 admissible W9 cells
+(κ filter unchanged). Stated limits: aggregate-level multiplier (RCT anchors are not task-level);
+marginal adopters are not random draws — the 15/56 band is a bound, not a CI.</p>
+<p><strong>(b) Vintage check:</strong> consumer Nov'25 (aei_raw_claude_ai.csv), consumer Feb'26
+(aei_raw_2026_02.csv), API Nov'25/Feb'26 (aei_api_*.csv); Aug'25 recorded as facet-absent (raw
+carries no task_success). Primary estimand: wage-bill-weighted success and automation share on
+tasks matched to the W6 weights (match rate reported); secondary: usage-weighted. Anchor assert:
+Nov'25 consumer reproduces the W9 inputs SUCC_NOW=0.759, AUTO_NOW=0.426 (wage-bill-weighted task
+means, as printed by notebook 28 S1) on matched rows. Pre-registered decision rule on consumer Δ(Nov→Feb): |Δ| &lt; 2pp ⇒
+indistinguishable (monitoring baseline established); Δ ≤ −2pp ⇒ evidence against unlock (it
+predicts monotone rise); Δ ≥ +2pp ⇒ faster than the unlock parameterization. Stated: one Nov→Feb
+step is underpowered (the 2029-midpoint unlock path predicts only ≈ +0.1pp at these dates); the
+value is the baseline plus the falsification direction, compounding each release. API columns
+track the W7d headroom target (is 0.85 itself stable?).</p>
+<p><strong>Disclosure (pre-lock exposure):</strong> a feasibility probe before this lock observed UNWEIGHTED
+vintage success means (API ≈ 63→64.5, consumer Feb ≈ 80); the primary wage-bill-weighted
+estimands were not computed before locking.</p>
+<p><strong>Outputs:</strong> notebooks/output/selection_unwind/{table_selection_paths, table_break_timing_
+selection, table_wedge_vintage_check}.csv; fig_selection_unwind, fig_wedge_vintages. Notebook 29;
+machinery from src/wedge_paths.py (anchor-asserted against shipped W7b/W9 outputs). In-notebook
+asserts: every path starts at the static band [0.58%, 1.43%]; the selection=none slice equals the
+shipped table_dynamic_paths.csv to 1e-9; g_sel bounds (=1 at t0, ≥ asymptote, ≤1).</p>
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W10 complete (notebooks/29_selection_unwind.py).</strong> All 96 paths (24 W9
+  cells × 4 selection variants) anchor at the static band; the selection=none slice reproduces the
+  shipped W9 paths to 1e-9. <strong>Selection unwind roughly halves the long-run paths:</strong> central cell,
+  verification lower bound, S(2035) falls 5.3%→2.4% (wedges flat) and 12.6%→5.8% (unlock 2029)
+  under unwind-27; band across RCT anchors {15,56}: S(2035) ∈ [1.9%, 3.8%] flat, [4.5%, 8.9%]
+  unlock. The 2027 coverage-channel peak SURVIVES unwinding (g_sel ≈ 1 while A ≈ A0 — the early
+  acceleration is inframarginal); the 2030 unlock peak is damped hardest (2.19→1.21 pp/yr and the
+  peak year shifts to 2027 under unwind-27). Every central cell still crosses +0.5 pp/yr in 2027 —
+  the near-term falsification test is robust to selection unwind; the long-run levels are not.</li>
+<li>2026-06-10 <code>[SURPRISE]</code> <strong>The quality wedge is measurably moving — faster than the W9 unlock
+  parameterization.</strong> Wage-bill-weighted task success (consumer, matched W6 rows): 76.0% (Nov'25) →
+  79.7% (Feb'26), +3.7pp in one quarter against the unlock path's predicted +0.1pp — the
+  pre-registered ≥+2pp criterion fires "FASTER than unlock". Automation share: 44.3%→45.8%
+  (+1.55pp, inside the ±2pp indistinguishable zone, but positive — first wage-bill-weighted sign of
+  verification-tax movement after 14 flat months in usage-weighted terms; W7c's flat verdict was
+  usage-weighted). API panel: success 61.4%→63.1% (scaffolded contexts attempt harder tasks — 15pp
+  BELOW consumer), automation 92.9%→91.3% wage-bill-weighted (the W7d 0.85 unlock target is
+  usage-weighted; the wage-bill-weighted API ceiling is ~0.92 — W9's AUTO_TARGET is conservative).
+  Tables: output/selection_unwind/{table_selection_paths, table_break_timing_selection,
+  table_wedge_vintage_check}.csv.</li>
+</ul>
+<h2>12. W11: GE task-model simulation — measured tasks in an AR framework (R-D §8.8)</h2>
+<h3>Pre-registered specification — LOCKED 2026-06-10, before any simulation</h3>
+<p><strong>Goal:</strong> the bottom-up GE counterpart of W9 — the 2,707 measured tasks (W6 wage-bill weights) in
+a static CES task framework, automation driven by the W9 wedge paths (NOT cost decline — W6: cost
+no longer binds, elasticity ≈ 0), solved as a closed-form sequence of equilibria. The GE content
+is what the multiplicative index cannot produce: composition (Baumol) effects, class-level wage
+bounds, and a labor-share statement.</p>
+<p><strong>Model:</strong> sector TFP(t) = [Σ α_i λ_i(t)^(1−σ)]^(−1/(1−σ)) (σ=1 limit: ln TFP = −Σ α_i ln λ_i);
+λ_i(t) = 1 − m_i(t)·δ_i^b·e_i with e_i = sav_i·succ_i (capped at 1 under unlock scaling),
+δ_i^lo = auto_share_i / δ_i^hi = 1 (the W7b verification band), m_i(t) = U(t)·work_share_i·
+1[hot_i ≤ H(t)] (the W9 wedges verbatim, now task-level); U(t) = min(A(t)·κ, 1) with κ from the
+W9 central-cell calibration. Expenditure shares s_i(t) = α_i λ_i^(1−σ)/Σ_j α_j λ_j^(1−σ) — for
+σ&lt;1 the automated tasks' shares FALL: the Baumol composition effect, provably absent at σ=1
+(power-mean inequality; a unit test). Aggregate bridge: Δln TFP_agg = 0.6 × 0.741 × Δln TFP_sector
+(Hulten; Domar ×1.9 sensitivity, W7-ext precedent).</p>
+<p><strong>Primary σ = 0.5</strong> (task complements; Baumol/Aghion-Jones-Jones range); sensitivity {0.2, 0.8,
+1.0}. Reinstatement: one non-automatable bin ν = 0.07 (W7c measured non-coverage, flat);
+sensitivity ν: 0.07→0.14 linear by 2040. Wages by W7e verifiability class (rubric byte-identical
+to notebook 27) under two mobility polar cases: (i) full mobility — single wage = sector TFP;
+(ii) no mobility — ℓ_i frozen at α_i, task wage from inverse demand. Bounds, not estimates.
+Labor share with AI priced at measured parity — pre-registered expectation: ≈ flat (at parity
+~600x AI is too cheap to claim income share; displacement appears as task reallocation, not
+labor-share decline).</p>
+<p><strong>Pre-registered predictions:</strong> (1) Baumol drag ≥ 0 for σ&lt;1, growing with automation mass;
+(2) unverifiable-class expenditure share rises (W7e's Baumol-within-cognitive-work, now in GE);
+(3) unverifiable relative wage rises under no-mobility, σ&lt;1.</p>
+<p><strong>Excluded (stated):</strong> capital/compute stock, endogenous innovation, intertemporal choice, IO
+network, labor-supply margin — no measured input disciplines any of them.</p>
+<p><strong>Scenario grid (small by design):</strong> central W9 cell (free-ceiling diffusion, 131d doubling,
+80% gate) × wedges {flat, unlock-2029} × band {lo, hi} × σ ∈ {0.2, 0.5, 0.8, 1.0} × selection
+{none, unwind-27} × ν {flat, growing}.</p>
+<p><strong>Verification:</strong> W7b ceiling assert (1e-9); W7e class wage-bill shares reproduced (±0.5pp);
+σ→1 continuity; σ=1 path reconciles with the W9 index (≤10% relative where S&lt;15% — log-vs-linear
+gap is second-order); Baumol-sign assert at all t; shares sum to 1; first-order anchor.</p>
+<p><strong>Outputs:</strong> notebooks/output/ge_task_model/{table_ge_paths, table_baumol_drag, table_class_shares,
+table_wage_bounds}.csv; fig_ge_vs_index, fig_baumol_drag, fig_wage_bounds. Notebook 30;
+src/task_model.py APPENDED (existing functions untouched); tests/test_task_model_ge.py.</p>
+<ul>
+<li>2026-06-10 <code>[DECISION]</code> (post-lock, disclosed) <strong>W11 reconciliation tolerance amended:</strong> the locked
+  criterion (σ=1 GE within 10% of the W9 index where S&lt;15%) holds only where S&lt;5% (observed: 2.7–3.2%
+  agreement at the 2027/2030 anchors). Beyond that, two level effects dominate: the ν=0.07
+  reinstatement bin dilutes measured-task weight (~−7%), and Jensen's inequality pushes the exact
+  Cobb-Douglas aggregate ABOVE the linear index as task-level cuts deepen (−ln λ convex; the index is
+  the first-order expansion). By 2035, σ=1 GE exceeds the index by 15% (lo) / 63% (hi). Treated as a
+  RESULT — the multiplicative index understates the exact aggregate at deep utilization — and the
+  assert pins the linearization region (S&lt;5%). One implementation fix mid-run: the unlock scenario
+  initially scaled only success; the automation-share unlock (δ → W9's g_auto, capped at 1 per task)
+  was added to task_lambdas before any results were logged.</li>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W11 complete (notebooks/30_ge_task_model.py + src/task_model.py W11
+  extension, 64 GE paths).</strong> All anchors hold: W7b ceilings (1e-9), W7e class wage-bill shares
+  reproduced exactly (verifiable 14.7 / middle 73.8 / unverifiable 11.5), Baumol sign (TFP(σ&lt;1) ≤
+  TFP(σ=1)) at every t. <strong>The Baumol drag is the GE content:</strong> σ=0.5, unlock, verification lower
+  bound: −0.26pp (2030), −1.77pp (2035), −2.77pp (2040) of aggregate TFP gain vs the fixed-share
+  benchmark; at σ=0.2 the 2040 drag is −4.0pp. Pre-registered predictions: (1) drag ≥ 0 ∀t ✓;
+  (2) unverifiable expenditure share rises ✓ but TINY (+0.1pp by 2035 — the within-cognitive-work
+  Baumol composition channel is directionally confirmed and quantitatively second-order at these
+  horizons, because class-mean λ differences are diluted by work-share and utilization); (3)
+  no-mobility relative wages spread as predicted: verifiable 0.91, middle 0.99, unverifiable 1.01
+  by 2035 (bounds, not estimates). <strong>Labor share: flat as locked</strong> — AI's income claim at measured
+  parity (~636×) is ≤ 0.04% of sector cost in 2035; displacement appears as task reallocation, not
+  labor-share decline. Tables: output/ge_task_model/{table_ge_paths, table_baumol_drag,
+  table_class_shares, table_wage_bounds}.csv.</li>
+</ul>
+<h3>W9 adjudication rule — addendum to §10 — LOCKED 2026-06-10, before the script's first run</h3>
+<p>Mechanical corner rule applied by scripts/update_w9_adjudication.py on each run:
+1. <strong>Verification wedge:</strong> latest-vintage aggregate automation share ≥ 0.48 (+2pp over the 0.461
+   anchor) ⇒ "unlock direction", else "flat".
+2. <strong>Adoption ceiling:</strong> realized BTOS A(t) compared against BOTH locked logistic fits (free
+   ceiling k≈0.40 vs L=0.5 k≈0.52); the fit with lower out-of-sample error on post-lock waves is
+   reported as favored.
+3. <strong>Coverage channel:</strong> Fernald trailing 8q mean dtfp_util vs the +1.4 pp/yr 2027 lower-bound
+   prediction (§10 [SURPRISE]); status ∈ {pending, supporting, rejected}; decision date 2027Q4.
+corner_verdict = the concatenation. Anchor discipline: the script NEVER edits notebook 28's
+A0/T0; if the latest wave deviates &gt;2pp from the anchored logistic, it logs a loud warning —
+re-anchoring is a manual spec amendment here. AEI raw downloads stay manual; schema drift marks
+the vintage <code>schema_mismatch — manual review</code> and never crashes the run. Outputs:
+output/w9_adjudication/{tracked_series.csv, adjudication_log.csv, W9_STATUS.md}.</p>
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W9 adjudication script live (scripts/update_w9_adjudication.py).</strong> First run,
+  all data through-disk: corner verdict <strong>"flat wedges x free ceiling, coverage pending"</strong> — automation
+  share 0.459 (Feb-26 consumer, &lt; 0.48; trend −11.4 pp/yr across Aug→Nov→Feb usage-weighted; note the
+  W10 wage-bill-weighted series moved +1.55pp the other way — both tracked), BTOS wave 202611 A=0.206
+  with refit k_free=0.40 / k_half=0.52 unchanged from lock (no post-lock waves yet — the free/L=0.5
+  horse race starts at wave 202612), Fernald 8q dtfp_util 0.24 vs threshold 1.87 pp/yr (baseline 0.47</li>
+<li>1.4): coverage <strong>pending</strong>, decision date 2027Q4. Aug'25 consumer vintage processed as <code>partial</code>
+  (success facet absent — disclosed deviation: full skip would drop the earliest automation point).
+  Outputs: output/w9_adjudication/{tracked_series, adjudication_log}.csv + W9_STATUS.md.</li>
+</ul>
+<h2>13. W12: AA-TFP forward projection — the J-curve with measured parameters (R-D §8.7)</h2>
+<h3>Pre-registered specification — LOCKED 2026-06-10, before any projection run</h3>
+<p><strong>Goal:</strong> under capex paths and the measured-savings paths, WHEN does the AI residual flip
+positive — the Brynjolfsson J-curve with measured parameters. Definition (increment form):
+  residual_AI(t) = ΔS(t) − α_AI·g_KAI(t) − β_AI·Δln(1+(μ−1)·A(t));  crossover = first t ≥ 0.
+ΔS(t) = annual increments of the W9/W10 realized-TFP paths (already embed all wedges — never
+multiplied by adoption or savings again). The augmentation term is the INCREMENT of
+compute_aatfp's level expression — the existing single-period function books the whole stock as
+one year's growth and would double-count along a path; project_aatfp_forward() (new, in
+src/ai_economic_metrics.py, unit-tested) uses Δln. Anchor assert: the capital term reproduces
+compute_aatfp's ai_capital_contribution (~1.75pp at g_KAI=0.35, α_AI=0.05) in a single period.</p>
+<p><strong>Scenario axes:</strong> W9 corners {central flat lo/hi, central unlock lo/hi, conservative corner
+(flat × L=0.5 × 50% gate, lo)} × selection {none, unwind-27 (g_sel from W10)} × capex paths
+{sustained 0.35; decelerating linearly in log to 0.04 by 2032; adoption-tied g_KAI = Ȧ/A
+rescaled to 0.35 at 2026} × α_AI ∈ {0.02, 0.05, 0.10} + one income-share-consistent path
+(cumulate K_AI from capex/GDP=0.013 with δ=0.25, r=0.05; α_AI(t) = (r+δ)·K_AI/Y). β_AI=0.05,
+μ=1.14 (repo defaults), A(t) = the W9 free-ceiling logistic. Free parameters named: α_AI, δ, r,
+the deceleration end-date.</p>
+<p><strong>What is a finding vs arithmetic (stated in advance):</strong> findings = which corners never flip
+(a permanent trough is falsifiable), the sensitivity ordering of the crossover year, and the
+income-share-consistent α_AI vs the 1.75pp headline; arithmetic = any single flip year
+conditional on a path. Outputs: notebooks/output/aatfp_forward/{table_residual_paths,
+table_crossover}.csv; fig_jcurve_fan, fig_decomposition. Notebook 31.</p>
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W12 complete (notebooks/31_aatfp_forward.py + project_aatfp_forward in
+  src/ai_economic_metrics.py, 120 scenario combos).</strong> Anchor holds: the single-period capital term
+  reproduces compute_aatfp's 1.75pp (α_AI·g_KAI = 0.05·0.35). <strong>The permanent trough is live:</strong> the
+  conservative corner (flat × L=0.5 × 50% gate, 196d, lo) never flips in any of its 24 combos, and
+  42/120 combos never cross by 2040. The hi-band central corners flip at 2027 in nearly every combo
+  (no trough at all); the genuine J-curves are the lo-band corners — central unlock lo crosses 2030
+  (sustained capex, α=0.05, no unwind), 2029 (adoption-tied), 2027 (decelerating), and unwind-27
+  pushes sustained/adoption-tied past 2040 (trough −1.7pp: permanent drag vs saturating savings).
+  Sensitivity ordering of the crossover year: corner = α_AI (14yr spread, never censored at 2041)<blockquote>
+<p>selection (11yr) &gt; capex (3yr). <strong>Income-share-consistent α_AI(2026) = 0.0065 — 7.7× below the
+  0.05 default: measured capex/GDP (1.3%, δ=0.25, r=0.05) supports a 0.23pp capital drag today, not
+  the 1.75pp headline</strong> (it reaches 0.05 only ~2034 even under permanently sustained 35% capex
+  growth). Outputs: output/aatfp_forward/{table_residual_paths, table_crossover}.csv,
+  fig_jcurve_fan, fig_decomposition.</p>
+</blockquote>
+</li>
+</ul>
+<h2>14. W13: Cross-country monitored panel (R-D §8.9)</h2>
+<h3>Pre-registered specification — LOCKED 2026-06-10</h3>
+<p><strong>Goal:</strong> the MODEST version — descriptive gradient + monitoring scaffold; "premature as
+identification, valuable as a monitored panel the W2 detector can consume later."</p>
+<p><strong>Construction:</strong> AUI_c = usage_share_pct_c / pop_share_pct_c (Anthropic AI Usage Index form);
+population = PWT 10.0 <code>pop</code> (2019, latest in repo; total-not-working-age, staleness stated;
+UN WPP is a future upgrade, not fetched now). Vintages on disk: Aug'25, Nov'25, Feb'26 raw.
+World-usage-weighted mean AUI ≡ 1 by construction (tested). Covariates: PWT rgdpo/pop, ctfp
+(2019 level), rtfpna growth 2000–2019; BCL-23 membership flag. New src/country_panel.py
+(ISO2→ISO3 static crosswalk; suffix-tolerant facet handling) + tests.</p>
+<p><strong>Descriptives (the full list):</strong> (a) log AUI vs log GDP/capita — the adoption gradient, OLS
+slope + binned scatter; (b) AUI vs 2019 TFP level and vs PRE-AI TFP growth (2000–2019) —
+labeled baselines; (c) cross-vintage AUI stability (rank correlation, movers).</p>
+<p><strong>DO-NOT list (verbatim, binding):</strong> no causal claims; no usage→TFP regressions of any kind
+(the TFP data is pre-AI — such a regression would regress the past on the future); no
+instrumenting; no country-level adoption→productivity statements. Named selection threats:
+language, payment rails, country availability/bans, Claude-vs-other-model composition.</p>
+<p><strong>Outputs:</strong> notebooks/output/country_panel/{monitored_panel.csv, fig_adoption_gradient,
+fig_aui_vs_tfp_baseline, fig_vintage_stability}. Per-release procedure: drop the new
+aei_raw_YYYY_MM.csv into aei_vintages/ and re-run notebook 32 (idempotent full rebuild).</p>
+<ul>
+<li>2026-06-10 <code>[RESULT]</code> <strong>W13 complete (notebooks/32_country_monitored_panel.py + src/country_panel.py).</strong>
+  Monitored panel built: 461 country×vintage rows (153–154 countries matched to PWT per vintage,
+  99.8% of country-attributed usage share covered; <code>not_classified</code> holds 16–20% of global usage).
+  <strong>The adoption gradient is near unit-elastic:</strong> log-AUI on log-GDP/pc slope 1.03 (R²=0.81, Feb'26;
+  0.96/1.02 in Aug/Nov'25). Pre-AI baselines (descriptive only): AUI–ctfp ρ=0.68; AUI–TFP-growth
+  2000–19 ρ=−0.18. Cross-vintage ranks are highly stable (Spearman 0.971 Aug'25→Feb'26; movers: ECU
+  −40, THA −30, BHS +29) — the panel is monitorable. Top AUI: CYM, SGP, LUX, ISR, CYP; US 4.62.
+  Spec note (disclosed): the binding identity is the POPULATION-share-weighted mean AUI ≡ 1 (the
+  locked text's "usage-weighted" form is not an identity — Cauchy–Schwarz); asserted per vintage.</li>
+</ul>
+<h3>W8 acquisition addendum (§8) — kill criterion pre-committed 2026-06-10</h3>
+<p>Fetchable-only campaign (user decision): scripted FRED/NBER re-probe for pre-1890 series, FRASER
+(Aldrich Report) and HathiTrust full-view checks; no manual transcription this round. Landing:
+data/energy_costs/us_coal_early/ with mandatory <code>unit</code> column and PROVENANCE.md per file
+(long ton 2240 lb vs short ton 2000 lb vs bushel — conversion only in the loader). <strong>Kill
+criterion:</strong> if fetchable sources cannot assemble ≥2 cities × ≥25 annual observations each
+inside 1820–1870, declare the window publicly unacquirable and record the fallback design
+(Philadelphia-only event study from Bezanson via ILL + UK validation [BOE millennium + Clark,
+in repo] + the 1890+ NBER series as late anchor).</p>
+<div class="foot">Part of a research program on GPT transitions and productivity ·
+every specification locked before estimation · code repository private — available on request</div>
+</div>
+</body>
+</html>

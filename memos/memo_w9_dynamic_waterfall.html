@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results Memo — W9: The Dynamic Waterfall (Projected Realized-TFP Path, 2026–2040)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ea;--paper-deep:#efe9db;--ink:#1d1a16;--ink-soft:#4d463c;
+--rule:#c9bfae;--oxblood:#7e2a23;--prussian:#1f3a5f;--gold:#9a7b2d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:"Source Serif 4",serif;font-size:16.5px;line-height:1.65}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+.crumb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+letter-spacing:.12em;text-transform:uppercase}
+.crumb a{color:var(--prussian);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+h1{font-family:"Fraunces",serif;font-weight:600;font-size:30px;
+line-height:1.25;margin:18px 0 6px}
+h2{font-family:"Fraunces",serif;font-weight:600;font-size:21px;
+margin:34px 0 10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+h3{font-family:"Fraunces",serif;font-weight:600;font-size:17.5px;
+margin:26px 0 8px}
+p,li{color:var(--ink-soft)}
+strong{color:var(--ink)}
+a{color:var(--prussian)}
+em{color:var(--ink-soft)}
+hr{border:none;border-top:1px solid var(--rule);margin:30px 0}
+code{font-family:"IBM Plex Mono",monospace;font-size:13px;
+background:var(--paper-deep);padding:1px 5px;border-radius:2px}
+pre{background:var(--paper-deep);border-left:3px solid var(--gold);
+padding:12px 16px;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:18px 0;font-size:14.5px;width:100%}
+th,td{border:1px solid var(--rule);padding:7px 11px;text-align:left;
+vertical-align:top}
+th{background:var(--paper-deep);font-family:"IBM Plex Mono",monospace;
+font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+blockquote{border-left:3px solid var(--rule);margin:16px 0;
+padding:2px 18px;color:var(--ink-soft)}
+.foot{margin-top:56px;border-top:1px solid var(--rule);padding-top:14px;
+font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="crumb"><a href="../index.html">&larr; Will AI show up in the productivity statistics?</a> &nbsp;·&nbsp; Memo · The Dynamic Waterfall (W9)</div>
+<h1>Results Memo — W9: The Dynamic Waterfall (Projected Realized-TFP Path, 2026–2040)</h1>
+<p><em>2026-06-10. Workstream W9 (RESEARCH_DIRECTIONS §9.4). Code: <code>notebooks/28_dynamic_waterfall.py</code>
+(consumes the W6 dataset, W7b wedges, W5 BTOS series). Outputs:
+<code>notebooks/output/dynamic_waterfall/</code>. Pre-registered spec: PAPER_NOTES.md §10 (locked 2026-06-10);
+one post-lock decision, disclosed below.</em></p>
+<h2>Question</h2>
+<p>W7b's waterfall is static accounting: 90% per-instance savings → measured wedges → a realized-now
+TFP band of [0.58%, 1.43%] at 9.3% incidence. Every number in that chain is a snapshot. What path
+does realized TFP take if each wedge moves at its <em>measured</em> speed — and when, under which
+parameterizations, does the implied TFP growth increment become large enough for the W2 detector
+to see?</p>
+<h2>Model</h2>
+<p>Anchored multiplicative index, no double counting:</p>
+<pre><code>S_b(t) = ceil_b(H(t)) × U_b(t) × g_succ(t) × g_auto_b(t),   b ∈ {lo, hi}
+</code></pre>
+<ul>
+<li><code>ceil_b(H)</code> — W7b's wedge-adjusted ceiling restricted to tasks with human-only time ≤ H
+  (the reliability frontier), aggregated through wage-bill weights as in W7b.</li>
+<li><code>U_b(t) = min(A(t)·κ_b, 1)</code> — utilization of the eligible frontier; A(t) is BTOS firm adoption,
+  κ_b is calibrated so every path starts <strong>exactly</strong> at the static band at t₀ = 2026.38 (asserted
+  against W7b's table in code).</li>
+<li><code>g_succ, g_auto</code> — quality and verification wedge multipliers (lower band only for <code>g_auto</code>).</li>
+</ul>
+<p>κ has an interpretation, and it is a finding in itself (below).</p>
+<h2>Wedge trajectories (measured where possible, parameterized where not)</h2>
+<table>
+<thead>
+<tr>
+<th>Wedge</th>
+<th>Trajectory</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incidence A(t)</td>
+<td>logistic, free-ceiling fit k = 0.40 (central); L = 0.5 fit k = 0.52 (sensitivity)</td>
+<td>BTOS through May 2026, measured</td>
+</tr>
+<tr>
+<td>Coverage H(t)</td>
+<td>80%-reliability horizon = 50%-horizon/5, anchored at Opus 4.5 = 320 min (2025.88), doubling 131 days</td>
+<td>METR TH1.1, measured; /5 ratio parameterized</td>
+</tr>
+<tr>
+<td>Success</td>
+<td>flat 75.6% vs unlock: → 95%, logistic midpoint 2029</td>
+<td>parameterization (capability is the unmeasured residual)</td>
+</tr>
+<tr>
+<td>Automation share</td>
+<td>flat 46% (its measured 14-month trajectory) vs unlock: → 85%</td>
+<td><strong>target is measured</strong> — the API/scaffolded level (W7d)</td>
+</tr>
+<tr>
+<td>Non-market share</td>
+<td>held fixed</td>
+<td>measured stable Nov→Feb</td>
+</tr>
+<tr>
+<td>Intensity</td>
+<td>held at 0.45</td>
+<td>BBD; conservative</td>
+</tr>
+</tbody>
+</table>
+<p>Post-lock decision (disclosed): grid cells where the coverage gate implies κ &gt; 1 — within-adopter
+utilization above 100% of the eligible frontier, contradicted by observed usage — are dropped
+(all 196-day-doubling × 80%-gate cells; they produced the perverse ordering "slower capability
+growth ⇒ faster TFP"). 24 of 32 cells survive.</p>
+<h2>Results</h2>
+<p><strong>1. The grid's peak-increment years cluster at exactly two dates: 2027 and 2030.</strong></p>
+<ul>
+<li><strong>2027 cluster</strong> — coverage-driven. At METR's measured 131-day doubling, the 80%-reliability
+  horizon crosses the <em>entire</em> AEI task sample (max human-only time ≈ 14 h) by mid-2027. Variants
+  with an active coverage channel front-load a near-doubling of realized TFP: +1.4 pp/yr (lower
+  bound) in 2027 <em>even with wedges flat</em>.</li>
+<li><strong>2030 cluster</strong> — wedge-unlock-driven. With the coverage channel already saturated (50% gate),
+  the verification-bound increment peaks at 2.2 pp/yr in 2030 under the unlock-by-2029 scenario.</li>
+</ul>
+<p><strong>2. Central paths (free-ceiling diffusion, 131-day doubling, 80% gate):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>S(2030)</th>
+<th>S(2035)</th>
+<th>Peak increment</th>
+<th>Peak year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wedges flat, verification lower bound</td>
+<td>3.1%</td>
+<td>5.3%</td>
+<td>1.4 pp/yr</td>
+<td>2027</td>
+</tr>
+<tr>
+<td>Wedges flat, upper bound</td>
+<td>8.1%</td>
+<td>13.9%</td>
+<td>3.8 pp/yr</td>
+<td>2027</td>
+</tr>
+<tr>
+<td>Unlock 2029, lower bound</td>
+<td>6.2%</td>
+<td>12.6%</td>
+<td>2.2 pp/yr</td>
+<td>2030</td>
+</tr>
+<tr>
+<td>Unlock 2029, upper bound</td>
+<td>9.6%</td>
+<td>17.1%</td>
+<td>3.8 pp/yr</td>
+<td>2027</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conservative corner</strong> (flat wedges, L = 0.5 ceiling, no coverage channel, lower bound): S
+plateaus at <strong>1.4%</strong>, peak increment <strong>0.18 pp/yr</strong> — permanently invisible to the W2 detector.
+The spread between that corner and the unlock paths is the entire adjudication space, and each
+incoming AEI vintage and BTOS wave narrows it.</p>
+<p><strong>3. κ: the eligible-task margin is saturated today.</strong> Calibration implies adopters already
+utilize 93–99% of the 80%-reliability frontier. Growth cannot come from deeper use of
+currently-reliable tasks; it must come from adoption (extensive margin) and verification (δ).
+This is the dynamic restatement of Paper C's ordering of binding constraints.</p>
+<p><strong>4. Scenario-B refresh (W4 link).</strong> Replacing the ADVI k = 0.155 with the BTOS-measured
+k ∈ [0.40, 0.52] in W4's diffusion-speed-scaled scenario:</p>
+<table>
+<thead>
+<tr>
+<th>Analogy</th>
+<th>Raw lag</th>
+<th>Scaled lag (k_AI = 0.40)</th>
+<th>Break year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Steam (k = 0.04)</td>
+<td>50 yrs</td>
+<td>5.0 yrs</td>
+<td><strong>2028</strong></td>
+</tr>
+<tr>
+<td>Electrification (k = 0.11)</td>
+<td>40 yrs</td>
+<td>10.9 yrs</td>
+<td><strong>2034</strong></td>
+</tr>
+<tr>
+<td>IT (k = 0.37)</td>
+<td>35 yrs</td>
+<td>32.1 yrs</td>
+<td>2055</td>
+</tr>
+</tbody>
+</table>
+<p>(k_AI = 0.52 compresses further: 2027 / 2031 / 2048.) The unified paper's "mid-2030s, more
+plausibly 2050s" sentence anchors on raw lags and the old k; <strong>measured adoption speed selects the
+compressed branch</strong> — late 2020s to early 2030s for the steam/electrification analogies. The two
+clusters of the dynamic waterfall (2027, 2030) and the speed-scaled analogies (2028, 2031–34) land
+in the same window from independent machinery.</p>
+<h2>The falsifiable near-term prediction</h2>
+<p>The 80%-gate coverage channel predicts measurable acceleration in <strong>2027</strong> (+1.4 pp/yr lower
+bound, wedges flat). The quarterly Fernald detector (W2) adjudicates within ~8 quarters: if 2027
+shows no such acceleration, the coverage channel is rejected and the no-coverage reading stands —
+everything rides on adoption × verification, and the earliest detectable increment moves to
+2029–2030, conditional on the wedges moving at all. Under the stagnation reading (wedges flat,
+slow diffusion), nothing is ever detectable: the transition stays inside the measurement wedges.</p>
+<h2>Limitations</h2>
+<p>Capability paths are parameterizations, not forecasts — W9 transmits scenarios through measured
+wedges; it does not predict the unlock. Selection unwind (savings falling toward RCT ATEs as
+incidence broadens) is noted, not modeled: upper paths overstate. BTOS speed/ceiling confounding
+at 2.9 years of data. The 80%/50% horizon ratio (/5) and the 2029 unlock midpoint are the two free
+parameters; everything else is fit to data on disk.</p>
+<hr />
+<p><em>Postscript (2026-06-10, later the same day): the three stated limitations above are now modeled,
+and the first vintage adjudication is in — see
+<a href="memo_w10_w13_dynamics.html">MEMO_W10_W13_dynamics</a>. Headline updates: selection unwind halves the
+long-run paths but the 2027 test survives; the quality wedge moved +3.7pp in one quarter (faster
+than the unlock parameterization); the income-share-consistent capital elasticity cuts the
+"1.75pp AI capex drag" to 0.23pp.</em></p>
+<div class="foot">Part of a research program on GPT transitions and productivity ·
+every specification locked before estimation · code repository private — available on request</div>
+</div>
+</body>
+</html>
