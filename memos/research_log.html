@@ -191,8 +191,6 @@ SPEED (signal exists, compressed below annual resolution) vs SCOPE (no signal at
 <li>2026-06-09 <code>[SURPRISE]</code> Short pre-windows (80q, i.e. 1975–1995) show strongly POSITIVE AC taus (+0.61 to +0.84) with raw surrogate p ≈ 0.03–0.04 — but they die under BH (q=0.37), flip sign at pre=120q, and have no variance counterpart (var taus strongly negative in the same windows). Treat as fragile/window-specific; report in robustness, do not claim.</li>
 <li>2026-06-09 <code>[SURPRISE]</code> The 1990:Q1-ending window flips var tau positive (+0.536, p=0.203, ns) — the primary's negative tau partly reflects the quiet early-1990s quarters. Window sensitivity to report, not a signal.</li>
 </ul>
-<h3>Limitations / TODO</h3>
-<h3>Paper integration queue</h3>
 <hr />
 <h2>2. W2: Real-time detector</h2>
 <p><strong>Question:</strong> Paper A claims the GPT/non-GPT distinction is "detectable in real time" but never builds
@@ -273,12 +271,6 @@ electrification-like (broad, slow) transition — an IT-like one produces no sig
   indicators currently disagree for the US. Watch, don't over-read (W1 showed AC-only signals without
   variance counterparts are fragile).</li>
 </ul>
-<h3>Limitations / TODO</h3>
-<h3>Paper integration queue</h3>
-<ul>
-<li><code>[NOTE]</code> Paper A (papers/paper_a_early_warning/paper.tex) still contains the unqualified "detectable
-  in real time" abstract claim — if Paper A is ever submitted separately, it needs the same correction.</li>
-</ul>
 <hr />
 <h2>3. W3: Pillar-intensity identification</h2>
 <p><strong>Question:</strong> Paper B's three-pillar decomposition fails (R² 0.77 but all pillar p &gt; 0.20) because the
@@ -348,7 +340,6 @@ the mechanism stays unidentified (an honest strengthening of Paper B's existing 
   channels. The fix would be more granular intensity measurement (e.g., engineering input shares per
   technology), not more econometrics.</li>
 </ul>
-<h3>Paper integration queue</h3>
 <hr />
 <h2>4. W4: AI break prediction refresh</h2>
 <p><strong>Question:</strong> When should an AI-driven TFP break appear, if one is coming? Notebook 12's current
@@ -382,7 +373,6 @@ and reframes the prediction conditionally on the W1/W2 findings.</p>
 <li><strong>Explicitly rejected:</strong> formal survival analysis on N=3 events (earlier W4 sketch) — decorative
   rigor; scenario logic is more honest.</li>
 </ul>
-<h3>Decision log</h3>
 <h3>Results log</h3>
 <ul>
 <li>2026-06-09 <code>[RESULT]</code> <strong>Full run complete (notebooks/18_ai_break_refresh.py).</strong></li>
@@ -410,7 +400,6 @@ and reframes the prediction conditionally on the W1/W2 findings.</p>
   popular intuition "AI is fast, so the break comes sooner" is not supported by the project's own
   diffusion-speed estimate.</li>
 </ul>
-<h3>Paper integration queue</h3>
 <hr />
 <h2>5. W5: AI as the 31st observation (RESEARCH_DIRECTIONS Project 2)</h2>
 <p><strong>Question:</strong> Out of sample, does Paper B's cost-barrier→diffusion-speed elasticity (−0.95, N=30)
@@ -438,10 +427,6 @@ predict AI's diffusion speed? Full design: <a href="RESEARCH_DIRECTIONS.md">RESE
 <li><strong>Honest-failure clause:</strong> k_AI=0.155 is on the books; if observed k falls outside the band, that is
   the result — a caveat to the unified paper, not a reason to revisit the barrier construction.</li>
 </ul>
-<h3>Decision log</h3>
-<h3>Results log</h3>
-<h3>Surprises / anomalies</h3>
-<h3>Paper integration queue</h3>
 <hr />
 <h2>6. W6: Task-level cost parity — JMP cross-section (RESEARCH_DIRECTIONS Project 1)</h2>
 <p><strong>Question:</strong> Does the human-vs-AI cost-parity gap predict task-level AI usage intensity, within
@@ -467,10 +452,6 @@ occupations? First pass = the cross-section; the AEI-vintage panel comes later.<
   BTOS industry cross-check); single-week snapshot (level estimates carry that caveat until vintages
   are pooled); time facets are AEI model-estimated.</li>
 </ul>
-<h3>Decision log</h3>
-<h3>Results log</h3>
-<h3>Surprises / anomalies</h3>
-<h3>Paper integration queue</h3>
 <hr />
 <h2>7. W7: Acemoglu upgrade — bottom-up TFP potential (RESEARCH_DIRECTIONS Project 4)</h2>
 <p><strong>Question:</strong> AI's aggregate TFP potential with both inputs MEASURED: AEI usage shares × AEI time
@@ -487,8 +468,6 @@ savings, aggregated through OES employment — replacing Acemoglu (2024)'s expos
   facets are model-estimated. W1 link: map the implied increment shift onto electrification-sized vs
   IT-sized historical increments.</li>
 </ul>
-<h3>Results log</h3>
-<h3>Surprises / anomalies</h3>
 <hr />
 <h2>8. W8: Firewood→coal — background data acquisition (RESEARCH_DIRECTIONS Project 3)</h2>
 <h3>Acquisition log</h3>
